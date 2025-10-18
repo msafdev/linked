@@ -66,6 +66,7 @@ export type ContactEntry = {
 };
 
 export type ReadCV = {
+  id: string;
   profile: Profile;
   work: WorkEntry[];
   writing: WritingEntry[];
@@ -76,6 +77,7 @@ export type ReadCV = {
 };
 
 export const LINK: ReadCV = {
+  id: "bfc74a00-3173-49d3-b891-e3d86101c1ac",
   profile: {
     name: "Salman Alfarisi",
     title: "Product Designer",
