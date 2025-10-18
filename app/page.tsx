@@ -1,103 +1,314 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LINK } from "@/constant";
 import Image from "next/image";
+import Link from "next/link";
+import { TbArrowUpRight, TbLink } from "react-icons/tb";
+
+const formatRange = (range: { from: string; to?: string }) => {
+  return range.to ? `${range.from} – ${range.to}` : `${range.from} – Present`;
+};
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="font-sans min-h-svh w-full bg-background text-sm text-foreground">
+      <div className="mx-auto flex w-full max-w-2xl flex-col px-6 py-12 sm:px-8 sm:py-16">
+        <header className="flex md:flex-row flex-col md:items-start gap-4 md:gap-8 mb-12">
+          <Avatar className="size-16 border border-border">
+            <AvatarImage src="https://github.com/msafdev.png" />
+            <AvatarFallback>SA</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-medium mb-0.5">{LINK.profile.name}</h1>
+            <p className="text-sm text-muted-foreground mb-1.5">
+              {LINK.profile.title} 📍 {LINK.profile.location}
+            </p>
+            {LINK.profile.website && (
+              <Link
+                href={LINK.profile.website.url}
+                className="inline-flex w-fit items-center rounded-full px-3 bg-muted py-1 hover:bg-muted/60"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <p className="text-xs text-muted-foreground">
+                  {LINK.profile.website.label}
+                </p>
+              </Link>
+            )}
+          </div>
+        </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <section className="space-y-4 w-full mb-12">
+          <h2 className="text-sm font-medium text-foreground">About</h2>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {LINK.profile.about}
+          </p>
+        </section>
+
+        <section className="space-y-4 w-full mb-12">
+          <h2 className="text-sm font-medium text-foreground">
+            Work Experience
+          </h2>
+          <div className="space-y-6">
+            {LINK.work.map((role) => (
+              <article
+                key={`${role.company}-${role.role}-${role.range.from}`}
+                className="grid gap-4 sm:grid-cols-[124px_auto]"
+              >
+                <span className="text-xs text-muted-foreground font-mono">
+                  {formatRange(role.range)}
+                </span>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      {role.url ? (
+                        <Link
+                          href={role.url}
+                          className="flex items-center gap-2"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <h3 className="text-sm font-medium leading-tight">
+                            {role.role} at {role.company}
+                          </h3>
+                          <div className="bg-muted text-muted-foreground p-0.5 rounded">
+                            <TbLink size={10} />
+                          </div>
+                        </Link>
+                      ) : (
+                        <h3 className="text-sm font-medium leading-tight">
+                          {role.role} at {role.company}
+                        </h3>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {role.location}
+                    </p>
+                  </div>
+                  {role.images && role.images.length > 0 && (
+                    <div className="flex flex-wrap gap-4">
+                      {role.images.map((image, index) => (
+                        <div
+                          key={`${index}-${image.src}`}
+                          className="relative w-full aspect-video max-w-48 overflow-hidden rounded-md bg-muted"
+                        >
+                          <Image
+                            src={image.src}
+                            alt=""
+                            fill
+                            sizes="192px"
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-4 w-full mb-12">
+          <h2 className="text-sm font-medium text-foreground">Writing</h2>
+          <div className="space-y-4">
+            {LINK.writing.map((piece) => (
+              <article
+                key={`${piece.title}-${piece.year}`}
+                className="grid gap-4 sm:grid-cols-[124px_auto]"
+              >
+                <span className="text-xs text-muted-foreground font-mono">
+                  {piece.year}
+                </span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    {piece.url ? (
+                      <Link
+                        href={piece.url}
+                        className="flex items-center gap-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="text-sm font-medium leading-tight">
+                          {piece.title}
+                        </h3>
+                        <div className="bg-muted text-muted-foreground p-0.5 rounded">
+                          <TbLink size={10} />
+                        </div>
+                      </Link>
+                    ) : (
+                      <h3 className="text-sm font-medium leading-tight">
+                        {piece.title}
+                      </h3>
+                    )}
+                  </div>
+                  {piece.subtitle && (
+                    <p className="text-xs text-muted-foreground">
+                      {piece.subtitle}
+                    </p>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-4 w-full mb-12">
+          <h2 className="text-sm font-medium text-foreground">Speaking</h2>
+          <div className="space-y-4">
+            {LINK.speaking.map((talk) => (
+              <article
+                key={`${talk.title}-${talk.date}`}
+                className="grid gap-4 sm:grid-cols-[124px_auto]"
+              >
+                <span className="text-xs text-muted-foreground font-mono">
+                  {talk.date}
+                </span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-medium leading-tight">
+                      {talk.title}
+                    </h3>
+                    {talk.url && (
+                      <Link
+                        href={talk.url}
+                        className="flex items-center gap-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <h3 className="text-sm font-medium leading-tight">
+                          {talk.title}
+                        </h3>
+                        <div className="bg-muted text-muted-foreground p-0.5 rounded">
+                          <TbLink size={10} />
+                        </div>
+                      </Link>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    {talk.subtitle && (
+                      <p className="text-xs text-muted-foreground">
+                        {talk.subtitle}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {talk.location}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {LINK.sideProjects.length > 0 && (
+          <section className="space-y-4 w-full mb-12">
+            <h2 className="text-sm font-medium text-foreground">
+              Side Projects
+            </h2>
+            <div className="space-y-4">
+              {LINK.sideProjects.map((project) => (
+                <article
+                  key={`${project.title}-${project.year}`}
+                  className="grid gap-4 sm:grid-cols-[124px_auto]"
+                >
+                  <span className="text-xs text-muted-foreground font-mono">
+                    {project.year}
+                  </span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      {project.url ? (
+                        <Link
+                          href={project.url}
+                          className="flex items-center gap-2"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <h3 className="text-sm font-medium leading-tight">
+                            {project.title}
+                          </h3>
+                          <div className="bg-muted text-muted-foreground p-0.5 rounded">
+                            <TbLink size={10} />
+                          </div>
+                        </Link>
+                      ) : (
+                        <h3 className="text-sm font-medium leading-tight">
+                          {project.title}
+                        </h3>
+                      )}
+                    </div>
+                    {project.subtitle && (
+                      <p className="text-xs text-muted-foreground">
+                        {project.subtitle}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="space-y-4 w-full mb-12">
+          <h2 className="text-sm font-medium text-foreground">Education</h2>
+          <div className="space-y-4">
+            {LINK.education.map((school) => (
+              <article
+                key={`${school.school}-${school.degree}`}
+                className="grid gap-4 sm:grid-cols-[124px_auto]"
+              >
+                <span className="text-xs text-muted-foreground font-mono">
+                  {formatRange(school.range)}
+                </span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-medium leading-tight">
+                      {school.degree}
+                    </h3>
+                  </div>
+                  <div className="space-y-1">
+                    {school.school && (
+                      <p className="text-xs text-muted-foreground">
+                        {school.school}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {school.location}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-4 w-full mb-12">
+          <h2 className="text-sm font-medium text-foreground">Contact</h2>
+          <div className="space-y-3">
+            {LINK.contact.map((item) => (
+              <div
+                key={`${item.label}-${item.value}`}
+                className="grid gap-4 sm:grid-cols-[124px_auto] items-baseline"
+              >
+                <span className="text-xs text-muted-foreground">
+                  {item.label}
+                </span>
+                {item.url ? (
+                  <Link
+                    href={item.url}
+                    className="text-sm text-foreground transition-colors hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {item.value}
+                  </Link>
+                ) : (
+                  <span className="text-sm text-foreground">{item.value}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }
