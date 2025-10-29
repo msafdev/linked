@@ -3,7 +3,7 @@ import { Geist_Mono, Golos_Text } from "next/font/google";
 import "./globals.css";
 
 const golosText = Golos_Text({
-  variable: "--font-golos-text",
+  variable: "--font-sans",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${golosText.variable} ${geistMono.variable} antialiased`}
+        className={`${golosText.variable} ${geistMono.variable} antialiased font-sans`}
       >
         {children}
       </body>

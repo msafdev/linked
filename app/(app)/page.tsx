@@ -1,8 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LINK } from "@/constant";
 import Image from "next/image";
 import Link from "next/link";
-import { TbArrowUpRight, TbLink } from "react-icons/tb";
+import { TbLink } from "react-icons/tb";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LINK } from "@/constant";
 
 const formatRange = (range: { from: string; to?: string }) => {
   return range.to ? `${range.from} – ${range.to}` : `${range.from} – Present`;
@@ -10,7 +11,7 @@ const formatRange = (range: { from: string; to?: string }) => {
 
 export default function Home() {
   return (
-    <main className="font-sans min-h-svh w-full bg-background text-sm text-foreground">
+    <main className="min-h-svh w-full bg-background text-sm text-foreground">
       <div className="mx-auto flex w-full max-w-2xl flex-col px-6 py-12 sm:px-8 sm:py-16">
         <header className="flex md:flex-row flex-col md:items-start gap-4 md:gap-8 mb-12">
           <Avatar className="size-16 border border-border">

@@ -81,12 +81,12 @@ export const LINK: ReadCV = {
   profile: {
     name: "Salman Alfarisi",
     title: "Product Designer",
-    location: "Jakarta",
+    location: "fr",
     about:
       "Product designer focusing on AI-assisted workflows, practical systems, and shipping velocity for lean teams.",
     website: {
       label: "website.com",
-      url: "https://salmoon.vercel.app",
+      url: "salmoon.vercel.app",
     },
   },
   work: [
