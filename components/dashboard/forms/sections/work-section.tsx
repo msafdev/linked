@@ -1,137 +1,165 @@
 "use client";
 
-import {
-  FieldArray,
-  type FormikProps,
-} from "formik";
-import type { ReactNode } from "react";
+import { motion } from "motion/react";
+import { type FormikProps } from "formik";
+import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { CollectionField, TextField } from "../fields";
 import {
-  emptyEntryFactories,
   type SectionInitialValuesMap,
   type WorkFormValues,
 } from "@/lib/dashboard-forms";
+import { ImagesField } from "@/components/input/images-field";
+import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
+import { cn } from "@/lib/utils";
+import {
+  COLLAPSE_TRANSITION,
+  COLLAPSE_VARIANTS,
+} from "./collapsible";
 
 type WorkFormik = FormikProps<SectionInitialValuesMap["work"]>;
 
 export function renderWorkSection(formik: WorkFormik): ReactNode {
   return (
-    <section className="space-y-4">
-      <h2 className="text-base font-semibold text-foreground">
-        Work experience
-      </h2>
-      <CollectionField
-        formik={formik}
-        name="work"
-        emptyEntryKey="work"
-        entryTitle="Role"
-        renderEntry={(entryIndex) => (
-          <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <TextField
-                formik={formik}
-                label="Role"
-                name={`work.${entryIndex}.role`}
-              />
-              <TextField
-                formik={formik}
-                label="Company"
-                name={`work.${entryIndex}.company`}
-              />
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <TextField
-                formik={formik}
-                label="Location"
-                name={`work.${entryIndex}.location`}
-              />
-              <TextField
-                formik={formik}
-                label="Company Website"
-                name={`work.${entryIndex}.url`}
-                placeholder="https://company.com"
-              />
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
+    <div className="space-y-6 w-full">
+      <section className="space-y-6 w-full">
+        <div className="header">
+          <h2>Work experience</h2>
+          <p className="text-sm text-muted-foreground font-normal mt-0.5">
+            List your previous roles and relevant work experience.
+          </p>
+        </div>
+        <CollectionField
+          formik={formik}
+          name="work"
+          emptyEntryKey="work"
+          entryTitle="Work"
+          renderEntryHeader={() => null}
+          renderEntry={(entryIndex, removeEntry) => (
+            <WorkEntry
+              entryIndex={entryIndex}
+              formik={formik}
+              removeEntry={removeEntry}
+            />
+          )}
+        />
+      </section>
+    </div>
+  );
+}
+
+type WorkEntryProps = {
+  entryIndex: number;
+  formik: WorkFormik;
+  removeEntry: () => void;
+};
+
+function WorkEntry({ entryIndex, formik, removeEntry }: WorkEntryProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const values = formik.values as WorkFormValues;
+  const images = values.work?.[entryIndex]?.images ?? [];
+
+  return (
+    <section className="w-full">
+      <div
+        className={cn(
+          "header flex items-center justify-between gap-3",
+          entryIndex !== 0 && "border-t-0"
+        )}
+      >
+        <h3>
+          <span className="font-mono text-muted-foreground text-sm font-normal">{`${
+            entryIndex + 1
+          }. `}</span>
+          Job overview
+        </h3>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            aria-label={isCollapsed ? "Expand role" : "Collapse role"}
+            onClick={() => {
+              setIsCollapsed((previous) => !previous);
+            }}
+          >
+            {isCollapsed ? <PiCaretDownBold /> : <PiCaretUpBold />}
+          </Button>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            onClick={removeEntry}
+          >
+            <PiTrashDuotone />
+          </Button>
+        </div>
+      </div>
+      <motion.div
+        initial={false}
+        animate={isCollapsed ? "collapsed" : "expanded"}
+        variants={COLLAPSE_VARIANTS}
+        transition={COLLAPSE_TRANSITION}
+        className="overflow-hidden"
+        style={{ pointerEvents: isCollapsed ? "none" : "auto" }}
+      >
+        <div className="flex flex-col gap-6">
+          <TextField
+            formik={formik}
+            label="Role"
+            name={`work.${entryIndex}.role`}
+            placeholder="Fullstack Developer"
+          />
+          <TextField
+            formik={formik}
+            label="Company"
+            name={`work.${entryIndex}.company`}
+            placeholder="Example Inc."
+            className="md:col-span-2"
+          />
+          <TextField
+            formik={formik}
+            label="Location"
+            name={`work.${entryIndex}.location`}
+            placeholder="Jakarta, Indonesia"
+            className="md:col-span-2"
+          />
+          <TextField
+            formik={formik}
+            label="Company Website"
+            name={`work.${entryIndex}.url`}
+            placeholder="company.com"
+            as="url"
+          />
+          <section className="space-y-6 w-full">
+            <h3 className="header">Timeline</h3>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <TextField
                 formik={formik}
                 label="Start"
                 name={`work.${entryIndex}.range.from`}
-                placeholder="2023"
+                placeholder="From"
+                as="date"
+                className="lg:col-span-4"
               />
               <TextField
                 formik={formik}
                 label="End"
                 name={`work.${entryIndex}.range.to`}
                 placeholder="Present"
+                as="date"
+                className="lg:col-span-4"
               />
             </div>
-            <FieldArray name={`work.${entryIndex}.images`}>
-              {({ push, remove }) => {
-                const values = formik.values as WorkFormValues;
-                const images = values.work?.[entryIndex]?.images ?? [];
-                return (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-foreground">
-                        Images
-                      </p>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => push(emptyEntryFactories.workImage())}
-                      >
-                        Add image
-                      </Button>
-                    </div>
-                    {images.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">
-                        No images added yet.
-                      </p>
-                    ) : (
-                      images.map((_, imageIndex) => (
-                        <div
-                          key={
-                            // biome-ignore lint/suspicious/noArrayIndexKey: FieldArray data relies on ordered indices.
-                            imageIndex
-                          }
-                          className="grid gap-3 md:grid-cols-[1fr_1fr_auto]"
-                        >
-                          <TextField
-                            formik={formik}
-                            label="Image URL"
-                            name={`work.${entryIndex}.images.${imageIndex}.src`}
-                            placeholder="/images/example.jpg"
-                          />
-                          <TextField
-                            formik={formik}
-                            label="Alt text"
-                            name={`work.${entryIndex}.images.${imageIndex}.alt`}
-                            placeholder="Optional description"
-                          />
-                          <div className="flex items-end">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => remove(imageIndex)}
-                            >
-                              Remove
-                            </Button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                );
-              }}
-            </FieldArray>
-          </div>
-        )}
-      />
+          </section>
+          <ImagesField
+            formik={formik}
+            fieldArrayName={`work.${entryIndex}.images`}
+            images={images}
+          />
+        </div>
+      </motion.div>
     </section>
   );
 }

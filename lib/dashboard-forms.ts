@@ -50,12 +50,12 @@ export const profileInitialValues: ProfileFormValues = {
   },
 };
 
-const workImageSchema = z.object({
+const imageSchema = z.object({
   src: z.string().min(1, "Image source is required"),
   alt: optionalStringSchema,
 });
 
-export type WorkImageFormValues = z.infer<typeof workImageSchema>;
+export type ImageFormValues = z.infer<typeof imageSchema>;
 
 const workRangeSchema = z.object({
   from: z.string().min(1, "Start date is required"),
@@ -68,7 +68,7 @@ const workEntrySchema = z.object({
   location: z.string().min(1, "Location is required"),
   range: workRangeSchema,
   url: optionalUrlSchema,
-  images: z.array(workImageSchema).default([]),
+  images: z.array(imageSchema).default([]),
 });
 
 export type WorkEntryFormValues = z.infer<typeof workEntrySchema>;
@@ -106,6 +106,7 @@ const listEntryBase = {
 const writingEntrySchema = z.object({
   ...listEntryBase,
   year: z.string().min(1, "Year is required"),
+  images: z.array(imageSchema).default([]),
 });
 
 export type WritingEntryFormValues = z.infer<typeof writingEntrySchema>;
@@ -122,6 +123,11 @@ export const writingInitialValues: WritingFormValues = {
     year: entry.year?.toString() ?? "",
     subtitle: entry.subtitle ?? "",
     url: entry.url ?? "",
+    images:
+      entry.images?.map((image) => ({
+        src: image.src ?? "",
+        alt: image.alt ?? "",
+      })) ?? [],
   })),
 };
 
@@ -129,6 +135,7 @@ const speakingEntrySchema = z.object({
   ...listEntryBase,
   date: z.string().min(1, "Date is required"),
   location: z.string().min(1, "Location is required"),
+  images: z.array(imageSchema).default([]),
 });
 
 export type SpeakingEntryFormValues = z.infer<typeof speakingEntrySchema>;
@@ -146,12 +153,18 @@ export const speakingInitialValues: SpeakingFormValues = {
     url: entry.url ?? "",
     date: entry.date ?? "",
     location: entry.location ?? "",
+    images:
+      entry.images?.map((image) => ({
+        src: image.src ?? "",
+        alt: image.alt ?? "",
+      })) ?? [],
   })),
 };
 
 const sideProjectEntrySchema = z.object({
   ...listEntryBase,
   year: z.string().min(1, "Year is required"),
+  images: z.array(imageSchema).default([]),
 });
 
 export type SideProjectEntryFormValues = z.infer<typeof sideProjectEntrySchema>;
@@ -169,6 +182,11 @@ export const sideProjectsInitialValues: SideProjectsFormValues = {
       year: entry.year?.toString() ?? "",
       subtitle: entry.subtitle ?? "",
       url: entry.url ?? "",
+      images:
+        entry.images?.map((image) => ({
+          src: image.src ?? "",
+          alt: image.alt ?? "",
+        })) ?? [],
     })) ?? [],
 };
 
@@ -260,7 +278,7 @@ export const emptyEntryFactories = {
     url: "",
     images: [],
   }),
-  workImage: (): WorkImageFormValues => ({
+  image: (): ImageFormValues => ({
     src: "",
     alt: "",
   }),
@@ -269,6 +287,7 @@ export const emptyEntryFactories = {
     year: "",
     subtitle: "",
     url: "",
+    images: [],
   }),
   speaking: (): SpeakingEntryFormValues => ({
     title: "",
@@ -276,12 +295,14 @@ export const emptyEntryFactories = {
     url: "",
     date: "",
     location: "",
+    images: [],
   }),
   sideProjects: (): SideProjectEntryFormValues => ({
     title: "",
     year: "",
     subtitle: "",
     url: "",
+    images: [],
   }),
   education: (): EducationEntryFormValues => ({
     degree: "",

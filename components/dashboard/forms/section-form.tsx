@@ -43,9 +43,10 @@ export function SectionForm<K extends DashboardState>({
       }}
     >
       {(formik) => (
-        <form className="space-y-8" onSubmit={formik.handleSubmit}>
+        <form className="w-full" onSubmit={formik.handleSubmit}>
           {renderSection(formik)}
-          <div className="flex justify-center gap-3 border-y-2 border-dashed py-3">
+          
+          <div className="flex justify-center gap-4 border-b-2 border-dashed py-4">
             <Button
               type="button"
               variant="outline"

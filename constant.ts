@@ -1,3 +1,5 @@
+import { Country } from "./types/country";
+
 export type ExternalLink = {
   label: string;
   url: string;
@@ -24,7 +26,7 @@ export type Profile = {
 export type WorkEntry = {
   role: string;
   company: string;
-  location: string;
+  location: Country["value"];
   range: DateRange;
   url?: string;
   images?: MediaResource[];
@@ -35,6 +37,7 @@ export type WritingEntry = {
   year: number;
   subtitle?: string;
   url?: string;
+  images?: MediaResource[];
 };
 
 export type SpeakingEntry = {
@@ -43,6 +46,7 @@ export type SpeakingEntry = {
   location: string;
   subtitle?: string;
   url?: string;
+  images?: MediaResource[];
 };
 
 export type SideProjectEntry = {
@@ -50,6 +54,7 @@ export type SideProjectEntry = {
   year: number;
   subtitle?: string;
   url?: string;
+  images?: MediaResource[];
 };
 
 export type EducationEntry = {
@@ -81,7 +86,7 @@ export const LINK: ReadCV = {
   profile: {
     name: "Salman Alfarisi",
     title: "Product Designer",
-    location: "fr",
+    location: "id",
     about:
       "Product designer focusing on AI-assisted workflows, practical systems, and shipping velocity for lean teams.",
     website: {
@@ -94,30 +99,12 @@ export const LINK: ReadCV = {
       role: "Senior Product Designer",
       company: "Atlas Labs",
       location: "San Francisco, CA",
-      range: { from: "2023", to: "Present" },
-      url: "https://atlaslabs.ai",
+      range: { from: "2023-01-01" },
+      url: "atlaslabs.ai",
       images: [
         { src: "/images/placeholder.webp", alt: "Placeholder" },
         { src: "/images/placeholder.webp", alt: "Placeholder" },
       ],
-    },
-    {
-      role: "Product Designer",
-      company: "Northwind Commerce",
-      location: "Jakarta, Indonesia",
-      range: { from: "2020", to: "2023" },
-    },
-    {
-      role: "Interaction Designer",
-      company: "Studio Kinetic",
-      location: "Bangkok, Thailand",
-      range: { from: "2017", to: "2020" },
-    },
-    {
-      role: "Freelance Designer",
-      company: "Self-initiated",
-      location: "Remote",
-      range: { from: "2014", to: "2017" },
     },
   ],
   writing: [
@@ -125,18 +112,7 @@ export const LINK: ReadCV = {
       title: "Designing With Guardrails",
       year: 2024,
       subtitle: "Collaboration with Mia Rahma and Dimas Putra",
-      url: "https://read.cv/writing/designing-with-guardrails",
-    },
-    {
-      title: "Building Narrative Prototypes",
-      year: 2023,
-      subtitle: "Zeroheight Field Notes",
-      url: "https://read.cv/writing/narrative-prototypes",
-    },
-    {
-      title: "Mapping the First Five Minutes",
-      year: 2022,
-      subtitle: "Personal essay",
+      url: "read.cv/msafdev",
     },
   ],
   speaking: [
@@ -145,19 +121,7 @@ export const LINK: ReadCV = {
       date: "2024",
       location: "San Francisco, CA",
       subtitle: "Config 2024",
-      url: "https://read.cv/speaking/config-2024",
-    },
-    {
-      title: "Design Ops, Practically",
-      date: "2023",
-      location: "New York, NY",
-      subtitle: "NYC Product Nights",
-    },
-    {
-      title: "Scaling Research Rituals",
-      date: "2022",
-      location: "Jakarta, Indonesia",
-      subtitle: "Product Circle",
+      url: "read.cv/config-2024",
     },
   ],
   sideProjects: [
@@ -177,13 +141,13 @@ export const LINK: ReadCV = {
       degree: "MFA Interaction Design",
       school: "School of Visual Arts",
       location: "New York, NY",
-      range: { from: "2018", to: "2020" },
+      range: { from: "2018-01-01", to: "2020-12-31" },
     },
     {
       degree: "BFA Graphic Design",
       school: "University of Toronto",
       location: "Toronto, ON",
-      range: { from: "2014", to: "2018" },
+      range: { from: "2014-01-01", to: "2018-12-31" },
     },
   ],
   contact: [

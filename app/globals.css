@@ -124,6 +124,6 @@
 
 @layer components {
   .header {
-    @apply text-base font-semibold text-foreground border-y-2 border-dashed py-3;
+    @apply text-base font-semibold text-foreground border-y-2 border-dashed py-4;
   }
 }

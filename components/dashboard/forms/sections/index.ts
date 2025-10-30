@@ -7,7 +7,7 @@ import type { SectionInitialValuesMap } from "@/lib/dashboard-forms";
 import { renderContactSection } from "./contact-section";
 import { renderEducationSection } from "./education-section";
 import { renderProfileSection } from "./profile-section";
-import { renderProjectsSection } from "./projects-section";
+import { renderProjectsSection } from "./project-section";
 import { renderSpeakingSection } from "./speaking-section";
 import { renderWorkSection } from "./work-section";
 import { renderWritingSection } from "./writing-section";
