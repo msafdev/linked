@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { emptyEntryFactories } from "@/lib/dashboard-forms";
+import { emptyEntryFactories } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/types/country";
 
@@ -355,8 +355,7 @@ export function TextField<TValues extends FormikValues>({
                   event.currentTarget.value = "";
                 }}
               />
-              <button
-                type="button"
+              <div
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
                   "relative size-20 bg-accent rounded transition-colors border shadow-xs",
@@ -398,7 +397,7 @@ export function TextField<TValues extends FormikValues>({
                     <span className="text-xs font-medium">Upload</span>
                   </div>
                 )}
-              </button>
+              </div>
             </div>
           );
         })()

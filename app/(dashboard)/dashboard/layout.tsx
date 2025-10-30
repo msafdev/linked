@@ -4,7 +4,7 @@ import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import {
   DASHBOARD_BASE_PATH,
   DASHBOARD_SECTIONS,
-} from "@/lib/dashboard-config";
+} from "@/lib/config";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (

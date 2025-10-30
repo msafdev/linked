@@ -5,18 +5,15 @@ import type { FormikProps } from "formik";
 import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
-import { CollectionField, TextField } from "../fields";
-import {
-  type SectionInitialValuesMap,
-  type SideProjectsFormValues,
-} from "@/lib/dashboard-forms";
+import { CollectionField, TextField } from "@/components/dashboard/forms/fields";
+import type {
+  SectionInitialValuesMap,
+  SideProjectsFormValues,
+} from "@/lib/schema";
 import { ImagesField } from "@/components/input/images-field";
 import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import {
-  COLLAPSE_TRANSITION,
-  COLLAPSE_VARIANTS,
-} from "./collapsible";
+import { COLLAPSE_TRANSITION, COLLAPSE_VARIANTS } from "@/components/dashboard/collapsible";
 
 type ProjectsFormik = FormikProps<SectionInitialValuesMap["projects"]>;
 
@@ -32,7 +29,7 @@ export function renderProjectsSection(formik: ProjectsFormik): ReactNode {
         </div>
         <CollectionField
           formik={formik}
-          name="sideProjects"
+          name="projects"
           emptyEntryKey="sideProjects"
           entryTitle="Project"
           addButtonLabel="Add project"
@@ -62,7 +59,7 @@ function ProjectEntry({
 }: ProjectEntryProps): ReactNode {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const values = formik.values as SideProjectsFormValues;
-  const images = values.sideProjects?.[entryIndex]?.images ?? [];
+  const images = values.projects?.[entryIndex]?.images ?? [];
 
   return (
     <section className="w-full">
@@ -104,20 +101,19 @@ function ProjectEntry({
         animate={isCollapsed ? "collapsed" : "expanded"}
         variants={COLLAPSE_VARIANTS}
         transition={COLLAPSE_TRANSITION}
-        
         style={{ pointerEvents: isCollapsed ? "none" : "auto" }}
       >
         <div className="flex flex-col gap-6">
           <TextField
             formik={formik}
             label="Title"
-            name={`sideProjects.${entryIndex}.title`}
+            name={`projects.${entryIndex}.title`}
             placeholder="Project name"
           />
           <TextField
             formik={formik}
             label="Year"
-            name={`sideProjects.${entryIndex}.year`}
+            name={`projects.${entryIndex}.year`}
             placeholder="January 1st, 2024"
             as="date"
             className="lg:col-span-4"
@@ -125,21 +121,21 @@ function ProjectEntry({
           <TextField
             formik={formik}
             label="URL"
-            name={`sideProjects.${entryIndex}.url`}
+            name={`projects.${entryIndex}.url`}
             placeholder="project.com"
             as="url"
           />
           <TextField
             formik={formik}
             label="Subtitle"
-            name={`sideProjects.${entryIndex}.subtitle`}
+            name={`projects.${entryIndex}.subtitle`}
             description="Share context about your role, collaborators, or impact."
             placeholder="Additional context"
             as="textarea"
           />
           <ImagesField
             formik={formik}
-            fieldArrayName={`sideProjects.${entryIndex}.images`}
+            fieldArrayName={`projects.${entryIndex}.images`}
             images={images}
             altPrefix={`project-${entryIndex + 1}`}
           />

@@ -1,16 +1,17 @@
 import type { FormikProps } from "formik";
 import type { ReactNode } from "react";
 
-import type { DashboardState } from "@/lib/dashboard-config";
-import type { SectionInitialValuesMap } from "@/lib/dashboard-forms";
+import type { DashboardState } from "@/lib/config";
+import type { SectionInitialValuesMap } from "@/lib/schema";
 
-import { renderContactSection } from "./contact-section";
-import { renderEducationSection } from "./education-section";
-import { renderProfileSection } from "./profile-section";
-import { renderProjectsSection } from "./project-section";
-import { renderSpeakingSection } from "./speaking-section";
-import { renderWorkSection } from "./work-section";
-import { renderWritingSection } from "./writing-section";
+import { renderContactSection } from "@/components/dashboard/forms/sections/contact-section";
+import { renderEducationSection } from "@/components/dashboard/forms/sections/education-section";
+import { renderProfileSection } from "@/components/dashboard/forms/sections/profile-section";
+import { renderProjectsSection } from "@/components/dashboard/forms/sections/project-section";
+import { renderSpeakingSection } from "@/components/dashboard/forms/sections/speaking-section";
+import { renderWorkSection } from "@/components/dashboard/forms/sections/work-section";
+import { renderWritingSection } from "@/components/dashboard/forms/sections/writing-section";
+import { renderSettingsSection } from "@/components/dashboard/forms/sections/account-section";
 
 export type SectionRenderer<State extends DashboardState> = (
   formik: FormikProps<SectionInitialValuesMap[State]>
@@ -28,4 +29,5 @@ export const sectionRenderers: SectionRenderersMap = {
   projects: renderProjectsSection,
   education: renderEducationSection,
   contact: renderContactSection,
+  settings: renderSettingsSection,
 };

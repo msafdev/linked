@@ -1,30 +1,41 @@
 "use client";
 
 import { Formik, setIn } from "formik";
+import { useEffect } from "react";
 import type { ZodTypeAny } from "zod";
 
 import { Button } from "@/components/ui/button";
-import type { DashboardState } from "@/lib/dashboard-config";
+import type { DashboardState } from "@/lib/config";
 import {
-  type SectionInitialValuesMap,
   sectionSchemas,
-} from "@/lib/dashboard-forms";
+  type SectionFormValuesMap,
+  type SectionInitialValuesMap,
+} from "@/lib/schema";
 import {
   getAllSectionValues,
+  initializeUserSectionValues,
   updateSectionValues,
-} from "@/lib/dashboard-form-state";
-import { sectionRenderers } from "./sections";
+} from "@/lib/form";
+import { sectionRenderers } from "@/components/dashboard/forms/sections";
 
 type SectionFormProps<K extends DashboardState = DashboardState> = {
   stateKey: K;
+  userId: string;
   initialValues: SectionInitialValuesMap[K];
+  allInitialValues: SectionFormValuesMap;
 };
 
 export function SectionForm<K extends DashboardState>({
   stateKey,
+  userId,
   initialValues,
+  allInitialValues,
 }: SectionFormProps<K>) {
   const schema = sectionSchemas[stateKey] as ZodTypeAny | undefined;
+
+  useEffect(() => {
+    initializeUserSectionValues(userId, allInitialValues);
+  }, [userId, allInitialValues]);
 
   if (!schema) {
     return null;
@@ -42,11 +53,13 @@ export function SectionForm<K extends DashboardState>({
       enableReinitialize
       validate={(values) => zodValidate(schema, values)}
       onSubmit={(values, helpers) => {
-        updateSectionValues(stateKey, values);
+        updateSectionValues(userId, stateKey, values);
+        const allSections = getAllSectionValues(userId) ?? allInitialValues;
         console.log({
+          userId,
           section: stateKey,
           values,
-          allSections: getAllSectionValues(),
+          allSections,
         });
         helpers.setSubmitting(false);
       }}
@@ -54,7 +67,7 @@ export function SectionForm<K extends DashboardState>({
       {(formik) => (
         <form className="w-full" onSubmit={formik.handleSubmit}>
           {renderSection(formik)}
-          
+
           <div className="flex justify-center gap-3 pt-6">
             <Button
               type="button"

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   emptyEntryFactories,
   type ImageFormValues,
-} from "@/lib/dashboard-forms";
+} from "@/lib/schema";
 import { PiPlusBold, PiXBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 

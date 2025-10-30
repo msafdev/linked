@@ -7,10 +7,10 @@ import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
 
 import { SOCIAL_OPTIONS } from "@/components/input/social-picker";
 import { Button } from "@/components/ui/button";
-import type { SectionInitialValuesMap } from "@/lib/dashboard-forms";
+import type { SectionInitialValuesMap } from "@/lib/schema";
 import { cn } from "@/lib/utils";
-import { CollectionField, TextField } from "../fields";
-import { COLLAPSE_TRANSITION, COLLAPSE_VARIANTS } from "./collapsible";
+import { CollectionField, TextField } from "@/components/dashboard/forms/fields";
+import { COLLAPSE_TRANSITION, COLLAPSE_VARIANTS } from "@/components/dashboard/collapsible";
 
 type ContactFormik = FormikProps<SectionInitialValuesMap["contact"]>;
 

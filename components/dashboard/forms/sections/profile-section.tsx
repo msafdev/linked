@@ -3,8 +3,8 @@
 import type { FormikProps } from "formik";
 import type { ReactNode } from "react";
 
-import { TextField } from "../fields";
-import type { SectionInitialValuesMap } from "@/lib/dashboard-forms";
+import { TextField } from "@/components/dashboard/forms/fields";
+import type { SectionInitialValuesMap } from "@/lib/schema";
 
 type ProfileFormik = FormikProps<SectionInitialValuesMap["profile"]>;
 

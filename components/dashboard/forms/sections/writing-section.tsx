@@ -5,18 +5,18 @@ import type { FormikProps } from "formik";
 import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
-import { CollectionField, TextField } from "../fields";
+import { CollectionField, TextField } from "@/components/dashboard/forms/fields";
 import {
   type SectionInitialValuesMap,
   type WritingFormValues,
-} from "@/lib/dashboard-forms";
+} from "@/lib/schema";
 import { ImagesField } from "@/components/input/images-field";
 import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import {
   COLLAPSE_TRANSITION,
   COLLAPSE_VARIANTS,
-} from "./collapsible";
+} from "@/components/dashboard/collapsible";
 
 type WritingFormik = FormikProps<SectionInitialValuesMap["writing"]>;
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { LINK } from "@/constant";
-import type { DashboardState } from "./dashboard-config";
+import { LINK, type ReadCV } from "@/constant";
+import type { DashboardState } from "@/lib/config";
 
 const optionalUrlSchema = z
   .string()
@@ -52,21 +52,6 @@ export const profileSchema = z
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
-export const profileInitialValues: ProfileFormValues = {
-  name: LINK.profile.name ?? "",
-  title: LINK.profile.title ?? "",
-  location: LINK.profile.location ?? "",
-  about: LINK.profile.about ?? "",
-  website: {
-    label: LINK.profile.website?.label ?? "",
-    url: LINK.profile.website?.url ?? "",
-  },
-  avatar: {
-    src: LINK.profile.avatar?.src ?? "",
-    alt: LINK.profile.avatar?.alt ?? "",
-  },
-};
-
 const workRangeSchema = z.object({
   from: z.string().min(1, "Start date is required"),
   to: optionalStringSchema,
@@ -89,24 +74,6 @@ export const workSchema = z.object({
 
 export type WorkFormValues = z.infer<typeof workSchema>;
 
-export const workInitialValues: WorkFormValues = {
-  work: LINK.work.map((entry) => ({
-    role: entry.role ?? "",
-    company: entry.company ?? "",
-    location: entry.location ?? "",
-    range: {
-      from: entry.range.from ?? "",
-      to: entry.range.to ?? "",
-    },
-    url: entry.url ?? "",
-    images:
-      entry.images?.map((image) => ({
-        src: image.src ?? "",
-        alt: image.alt ?? "",
-      })) ?? [],
-  })),
-};
-
 const listEntryBase = {
   title: z.string().min(1, "Title is required"),
   subtitle: optionalStringSchema,
@@ -127,20 +94,6 @@ export const writingSchema = z.object({
 
 export type WritingFormValues = z.infer<typeof writingSchema>;
 
-export const writingInitialValues: WritingFormValues = {
-  writing: LINK.writing.map((entry) => ({
-    title: entry.title ?? "",
-    year: entry.year?.toString() ?? "",
-    subtitle: entry.subtitle ?? "",
-    url: entry.url ?? "",
-    images:
-      entry.images?.map((image) => ({
-        src: image.src ?? "",
-        alt: image.alt ?? "",
-      })) ?? [],
-  })),
-};
-
 const speakingEntrySchema = z.object({
   ...listEntryBase,
   date: z.string().min(1, "Date is required"),
@@ -156,21 +109,6 @@ export const speakingSchema = z.object({
 
 export type SpeakingFormValues = z.infer<typeof speakingSchema>;
 
-export const speakingInitialValues: SpeakingFormValues = {
-  speaking: LINK.speaking.map((entry) => ({
-    title: entry.title ?? "",
-    subtitle: entry.subtitle ?? "",
-    url: entry.url ?? "",
-    date: entry.date ?? "",
-    location: entry.location ?? "",
-    images:
-      entry.images?.map((image) => ({
-        src: image.src ?? "",
-        alt: image.alt ?? "",
-      })) ?? [],
-  })),
-};
-
 const sideProjectEntrySchema = z.object({
   ...listEntryBase,
   year: z.string().min(1, "Year is required"),
@@ -180,25 +118,10 @@ const sideProjectEntrySchema = z.object({
 export type SideProjectEntryFormValues = z.infer<typeof sideProjectEntrySchema>;
 
 export const sideProjectsSchema = z.object({
-  sideProjects: z.array(sideProjectEntrySchema).min(0),
+  projects: z.array(sideProjectEntrySchema).min(1, "Add at least one entry"),
 });
 
 export type SideProjectsFormValues = z.infer<typeof sideProjectsSchema>;
-
-export const sideProjectsInitialValues: SideProjectsFormValues = {
-  sideProjects:
-    LINK.sideProjects?.map((entry) => ({
-      title: entry.title ?? "",
-      year: entry.year?.toString() ?? "",
-      subtitle: entry.subtitle ?? "",
-      url: entry.url ?? "",
-      images:
-        entry.images?.map((image) => ({
-          src: image.src ?? "",
-          alt: image.alt ?? "",
-        })) ?? [],
-    })) ?? [],
-};
 
 const educationEntrySchema = z.object({
   degree: z.string().min(1, "Degree is required"),
@@ -215,18 +138,6 @@ export const educationSchema = z.object({
 
 export type EducationFormValues = z.infer<typeof educationSchema>;
 
-export const educationInitialValues: EducationFormValues = {
-  education: LINK.education.map((entry) => ({
-    degree: entry.degree ?? "",
-    school: entry.school ?? "",
-    location: entry.location ?? "",
-    range: {
-      from: entry.range.from ?? "",
-      to: entry.range.to ?? "",
-    },
-  })),
-};
-
 const contactEntrySchema = z.object({
   label: z.string().min(1, "Label is required"),
   value: z.string().min(1, "Value is required"),
@@ -241,13 +152,18 @@ export const contactSchema = z.object({
 
 export type ContactFormValues = z.infer<typeof contactSchema>;
 
-export const contactInitialValues: ContactFormValues = {
-  contact: LINK.contact.map((entry) => ({
-    label: entry.label ?? "",
-    value: entry.value ?? "",
-    url: entry.url ?? "",
-  })),
-};
+const domainRegex = /^[a-zA-Z0-9]+$/;
+
+const settingsSchema = z.object({
+  domain: z
+    .string()
+    .min(3, "Domain must be at least 3 characters")
+    .max(32, "Domain must be 32 characters or fewer")
+    .regex(domainRegex, "Only letters and numbers are allowed"),
+  billingStatus: z.string().min(1),
+});
+
+export type SettingsFormValues = z.infer<typeof settingsSchema>;
 
 export const sectionSchemas: Record<DashboardState, z.ZodTypeAny> = {
   profile: profileSchema,
@@ -257,6 +173,7 @@ export const sectionSchemas: Record<DashboardState, z.ZodTypeAny> = {
   projects: sideProjectsSchema,
   education: educationSchema,
   contact: contactSchema,
+  settings: settingsSchema,
 };
 
 export type SectionFormValuesMap = {
@@ -267,17 +184,169 @@ export type SectionFormValuesMap = {
   projects: SideProjectsFormValues;
   education: EducationFormValues;
   contact: ContactFormValues;
+  settings: SettingsFormValues;
 };
 
-export const sectionInitialValues: SectionFormValuesMap = {
-  profile: profileInitialValues,
-  work: workInitialValues,
-  writing: writingInitialValues,
-  speaking: speakingInitialValues,
-  projects: sideProjectsInitialValues,
-  education: educationInitialValues,
-  contact: contactInitialValues,
-};
+function normalizeAvatarSource(
+  avatar: ReadCV["profile"]["avatar"]
+): { src: string; alt: string } {
+  const avatarArray = Array.isArray(avatar)
+    ? avatar
+    : avatar
+    ? [avatar]
+    : [];
+  const firstAvatar = avatarArray[0] ?? null;
+  return {
+    src: firstAvatar?.src ?? "",
+    alt: firstAvatar?.alt ?? "",
+  };
+}
+
+function mapImages(
+  images: ReadCV["work"][number]["images"] | undefined
+): ImageFormValues[] {
+  return (
+    images?.map((image) => ({
+      src: image?.src ?? "",
+      alt: image?.alt ?? "",
+    })) ?? []
+  );
+}
+
+function toYearString(value: number | undefined | null): string {
+  return value !== undefined && value !== null ? String(value) : "";
+}
+
+export function createProfileInitialValues(data: ReadCV): ProfileFormValues {
+  const avatar = normalizeAvatarSource(data.profile.avatar);
+  return {
+    name: data.profile.name ?? "",
+    title: data.profile.title ?? "",
+    location: data.profile.location ?? "",
+    about: data.profile.about ?? "",
+    website: {
+      label: data.profile.website?.label ?? "",
+      url: data.profile.website?.url ?? "",
+    },
+    avatar,
+  };
+}
+
+export function createWorkInitialValues(data: ReadCV): WorkFormValues {
+  return {
+    work:
+      data.work?.map((entry) => ({
+        role: entry.role ?? "",
+        company: entry.company ?? "",
+        location: entry.location ?? "",
+        range: {
+          from: entry.range.from ?? "",
+          to: entry.range.to ?? "",
+        },
+        url: entry.url ?? "",
+        images: mapImages(entry.images),
+      })) ?? [],
+  };
+}
+
+export function createWritingInitialValues(data: ReadCV): WritingFormValues {
+  return {
+    writing:
+      data.writing?.map((entry) => ({
+        title: entry.title ?? "",
+        year: toYearString(entry.year),
+        subtitle: entry.subtitle ?? "",
+        url: entry.url ?? "",
+        images: mapImages(entry.images),
+      })) ?? [],
+  };
+}
+
+export function createSpeakingInitialValues(data: ReadCV): SpeakingFormValues {
+  return {
+    speaking:
+      data.speaking?.map((entry) => ({
+        title: entry.title ?? "",
+        date: entry.date ?? "",
+        location: entry.location ?? "",
+        subtitle: entry.subtitle ?? "",
+        url: entry.url ?? "",
+        images: mapImages(entry.images),
+      })) ?? [],
+  };
+}
+
+export function createSideProjectsInitialValues(
+  data: ReadCV
+): SideProjectsFormValues {
+  return {
+    projects:
+      data.sideProjects?.map((entry) => ({
+        title: entry.title ?? "",
+        year: toYearString(entry.year),
+        subtitle: entry.subtitle ?? "",
+        url: entry.url ?? "",
+        images: mapImages(entry.images),
+      })) ?? [],
+  };
+}
+
+export function createEducationInitialValues(
+  data: ReadCV
+): EducationFormValues {
+  return {
+    education:
+      data.education?.map((entry) => ({
+        degree: entry.degree ?? "",
+        school: entry.school ?? "",
+        location: entry.location ?? "",
+        range: {
+          from: entry.range.from ?? "",
+          to: entry.range.to ?? "",
+        },
+      })) ?? [],
+  };
+}
+
+export function createContactInitialValues(
+  data: ReadCV
+): ContactFormValues {
+  return {
+    contact:
+      data.contact?.map((entry) => ({
+        label: entry.label ?? "",
+        value: entry.value ?? "",
+        url: entry.url ?? "",
+      })) ?? [],
+  };
+}
+
+export function createSettingsInitialValues(
+  data: ReadCV
+): SettingsFormValues {
+  return {
+    domain: (data.settings?.domain ?? data.id ?? "").toLowerCase(),
+    billingStatus: data.settings?.billingStatus ?? "trial",
+  };
+}
+
+export function createSectionInitialValues(
+  data: ReadCV
+): SectionFormValuesMap {
+  return {
+    profile: createProfileInitialValues(data),
+    work: createWorkInitialValues(data),
+    writing: createWritingInitialValues(data),
+    speaking: createSpeakingInitialValues(data),
+    projects: createSideProjectsInitialValues(data),
+    education: createEducationInitialValues(data),
+    contact: createContactInitialValues(data),
+    settings: createSettingsInitialValues(data),
+  };
+}
+
+export const defaultSectionInitialValues =
+  createSectionInitialValues(LINK);
 
 export const emptyEntryFactories = {
   work: (): WorkEntryFormValues => ({
@@ -327,4 +396,4 @@ export const emptyEntryFactories = {
   }),
 } satisfies Record<string, () => unknown>;
 
-export type SectionInitialValuesMap = typeof sectionInitialValues;
+export type SectionInitialValuesMap = SectionFormValuesMap;
