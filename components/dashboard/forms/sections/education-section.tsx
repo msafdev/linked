@@ -9,10 +9,7 @@ import { CollectionField, TextField } from "../fields";
 import type { SectionInitialValuesMap } from "@/lib/dashboard-forms";
 import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import {
-  COLLAPSE_TRANSITION,
-  COLLAPSE_VARIANTS,
-} from "./collapsible";
+import { COLLAPSE_TRANSITION, COLLAPSE_VARIANTS } from "./collapsible";
 
 type EducationFormik = FormikProps<SectionInitialValuesMap["education"]>;
 
@@ -97,7 +94,6 @@ function EducationEntry({
         animate={isCollapsed ? "collapsed" : "expanded"}
         variants={COLLAPSE_VARIANTS}
         transition={COLLAPSE_TRANSITION}
-        className="overflow-hidden"
         style={{ pointerEvents: isCollapsed ? "none" : "auto" }}
       >
         <div className="flex flex-col gap-6">

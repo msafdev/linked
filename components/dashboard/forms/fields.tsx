@@ -1,25 +1,27 @@
-"use client";
+﻿"use client";
 
-import { FieldArray, getIn, type FormikProps, type FormikValues } from "formik";
+import { format, isValid, parseISO } from "date-fns";
+import { FieldArray, type FormikProps, type FormikValues, getIn } from "formik";
+import Image from "next/image";
 import {
-  useRef,
-  useState,
   type HTMLInputTypeAttribute,
   type ReactNode,
+  useRef,
+  useState,
 } from "react";
-import { format, isValid, parseISO } from "date-fns";
+import { PiImageSquareDuotone, PiPlusBold, PiXBold } from "react-icons/pi";
 
+import { CountryPicker } from "@/components/input/country-picker";
+import { DatePicker } from "@/components/input/date-picker";
+import { SocialPicker } from "@/components/input/social-picker";
+import { UrlInput } from "@/components/input/url-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { CountrySelect } from "@/components/input/country-select";
-import { COUNTRIES } from "@/types/country";
-import { UrlInput } from "@/components/input/url-input";
-import { DatePicker } from "@/components/input/date-picker";
 import { emptyEntryFactories } from "@/lib/dashboard-forms";
-import { PiImageSquareDuotone, PiPlusBold } from "react-icons/pi";
+import { cn } from "@/lib/utils";
+import { COUNTRIES } from "@/types/country";
 
 export type TextFieldProps<TValues extends FormikValues> = {
   formik: FormikProps<TValues>;
@@ -28,9 +30,18 @@ export type TextFieldProps<TValues extends FormikValues> = {
   placeholder?: string;
   description?: string;
   type?: HTMLInputTypeAttribute;
-  as?: "input" | "textarea" | "country" | "url" | "date" | "file";
+  as?:
+    | "input"
+    | "textarea"
+    | "country"
+    | "social"
+    | "url"
+    | "date"
+    | "file"
+    | "avatar";
   className?: string;
   accept?: string;
+  pre?: string;
 };
 
 export function TextField<TValues extends FormikValues>({
@@ -43,6 +54,7 @@ export function TextField<TValues extends FormikValues>({
   as = "input",
   className,
   accept,
+  pre,
 }: TextFieldProps<TValues>) {
   const fieldId = name.replace(/\./g, "-");
   const value = getIn(formik.values, name);
@@ -115,7 +127,7 @@ export function TextField<TValues extends FormikValues>({
           className={cn("resize-y col-span-full md:col-span-4", className)}
         />
       ) : as === "country" ? (
-        <CountrySelect
+        <CountryPicker
           value={value ?? ""}
           onChange={(next) => {
             formik.setFieldValue(name, next);
@@ -125,15 +137,40 @@ export function TextField<TValues extends FormikValues>({
           placeholder={placeholder ?? "Select a country"}
           className={cn("col-span-full md:col-span-2", className)}
         />
+      ) : as === "social" ? (
+        <SocialPicker
+          value={value ?? ""}
+          onChange={(next) => {
+            formik.setFieldValue(name, next);
+            formik.setFieldTouched(name, true, false);
+          }}
+          placeholder={placeholder ?? "Select a platform"}
+          className={cn("col-span-full md:col-span-2", className)}
+        />
       ) : as === "url" ? (
         <UrlInput
-          type={type}
           name={name}
           placeholder={placeholder}
           value={value ?? ""}
-          onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           className={cn("col-span-full md:col-span-3", className)}
+          prefix={pre ?? undefined}
+          onValueChange={(inputValue) => {
+            const prefix = typeof pre === "string" && pre.length > 0 ? pre : "";
+            const trimmed = inputValue.trim();
+            const withoutPrefix = trimmed.startsWith(prefix)
+              ? trimmed.slice(prefix.length)
+              : trimmed;
+            const nextValue =
+              trimmed.length === 0
+                ? prefix
+                : prefix
+                ? `${prefix}${withoutPrefix}`
+                : trimmed;
+            formik.setFieldValue(name, nextValue);
+            formik.setFieldTouched(name, true, false);
+            formik.setFieldError(name, undefined);
+          }}
         />
       ) : as === "date" ? (
         (() => {
@@ -169,7 +206,9 @@ export function TextField<TValues extends FormikValues>({
               name={name}
               value={parsedDate}
               onChange={(nextDate) => {
-                const formatted = nextDate ? format(nextDate, "yyyy-MM-dd") : "";
+                const formatted = nextDate
+                  ? format(nextDate, "yyyy-MM-dd")
+                  : "";
                 formik.setFieldValue(name, formatted);
               }}
               onBlur={() => {
@@ -198,9 +237,8 @@ export function TextField<TValues extends FormikValues>({
               formik.setFieldTouched(name, true, false);
             }}
           />
-          <div
-            role="button"
-            tabIndex={0}
+          <button
+            type="button"
             className={cn(
               "flex flex-col items-center justify-center rounded-lg border border-dashed border-muted-foreground/60 bg-muted/10 px-6 py-10 text-center transition",
               "hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2",
@@ -208,12 +246,6 @@ export function TextField<TValues extends FormikValues>({
             )}
             onClick={() => {
               fileInputRef.current?.click();
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                fileInputRef.current?.click();
-              }
             }}
             onDragEnter={(event) => {
               event.preventDefault();
@@ -229,7 +261,10 @@ export function TextField<TValues extends FormikValues>({
             onDragLeave={(event) => {
               event.preventDefault();
               const relatedTarget = event.relatedTarget as Node | null;
-              if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
+              if (
+                !relatedTarget ||
+                !event.currentTarget.contains(relatedTarget)
+              ) {
                 setIsDraggingFile(false);
               }
             }}
@@ -246,16 +281,20 @@ export function TextField<TValues extends FormikValues>({
                 ? "Drop a new image or click to replace"
                 : "Drop your image here or click to browse"}
             </p>
-            <p className="mt-2 text-xs text-muted-foreground/80">Max size: 5MB</p>
-          </div>
+            <p className="mt-2 text-xs text-muted-foreground/80">
+              Max size: 5MB
+            </p>
+          </button>
           {typeof value === "string" && value ? (
             <div className="flex items-center gap-4">
               <div className="relative h-20 w-20 overflow-hidden rounded-md border">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={value}
                   alt={label}
-                  className="size-full object-cover"
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                  unoptimized
                 />
               </div>
               <span className="text-xs text-muted-foreground break-all">
@@ -264,6 +303,105 @@ export function TextField<TValues extends FormikValues>({
             </div>
           ) : null}
         </div>
+      ) : as === "avatar" ? (
+        (() => {
+          const prefix = name.endsWith(".src") ? name.slice(0, -4) : name;
+          const altFieldName = `${prefix}.alt`;
+          const previewSrc = typeof value === "string" && value ? value : "";
+          const handleAvatarSelection = (file: File | null) => {
+            if (!file) {
+              return;
+            }
+            if (!file.type.startsWith("image/")) {
+              formik.setFieldError(name, "Only image files are supported");
+              formik.setFieldTouched(name, true, false);
+              return;
+            }
+            if (file.size > maxFileSizeBytes) {
+              formik.setFieldError(name, "Max file size is 5MB");
+              formik.setFieldTouched(name, true, false);
+              return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+              const result = reader.result;
+              if (typeof result === "string") {
+                const derivedAlt =
+                  file.name.replace(/\.[^.]+$/, "") || "profile-avatar";
+                formik.setFieldValue(name, result);
+                formik.setFieldValue(altFieldName, derivedAlt);
+                formik.setFieldTouched(name, true, false);
+                formik.setFieldTouched(altFieldName, true, false);
+                formik.setFieldError(name, undefined);
+              }
+            };
+            reader.readAsDataURL(file);
+          };
+          return (
+            <div
+              className={cn(
+                "col-span-full md:col-span-3 flex flex-col gap-3",
+                className
+              )}
+            >
+              <input
+                id={fieldId}
+                ref={fileInputRef}
+                type="file"
+                accept={accept ?? "image/*"}
+                className="sr-only"
+                onChange={(event) => {
+                  handleAvatarSelection(event.currentTarget.files?.[0] ?? null);
+                  event.currentTarget.value = "";
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={cn(
+                  "relative size-20 bg-accent rounded transition-colors border shadow-xs",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 cursor-pointer"
+                )}
+              >
+                {previewSrc ? (
+                  <>
+                    <Image
+                      src={previewSrc}
+                      alt="Profile preview"
+                      fill
+                      sizes="96px"
+                      className="object-cover rounded"
+                      unoptimized
+                    />
+                    {previewSrc ? (
+                      <Button
+                        type="button"
+                        size="icon"
+                        className="absolute -right-2 -top-2 size-6 rounded-full p-0 border-[2.5px] border-background shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          
+                          formik.setFieldValue(name, "");
+                          formik.setFieldValue(altFieldName, "");
+                          formik.setFieldTouched(name, true, false);
+                          formik.setFieldTouched(altFieldName, true, false);
+                          formik.setFieldError(name, undefined);
+                        }}
+                      >
+                        <PiXBold className="size-3.5 text-white" />
+                      </Button>
+                    ) : null}
+                  </>
+                ) : (
+                  <div className="flex size-full flex-col items-center justify-center gap-1 text-muted-foreground">
+                    <PiImageSquareDuotone className="size-6" />
+                    <span className="text-xs font-medium">Upload</span>
+                  </div>
+                )}
+              </button>
+            </div>
+          );
+        })()
       ) : (
         <Input
           id={fieldId}

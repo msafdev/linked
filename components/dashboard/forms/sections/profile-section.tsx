@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type { FormikProps } from "formik";
 import type { ReactNode } from "react";
@@ -19,6 +19,12 @@ export function renderProfileSection(formik: ProfileFormik): ReactNode {
           </p>
         </div>
         <TextField formik={formik} label="Name" name="name" />
+        <TextField
+          formik={formik}
+          label="Profile picture"
+          name="avatar.src"
+          as="avatar"
+        />
         <TextField
           formik={formik}
           label="Title"

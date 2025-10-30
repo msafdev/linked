@@ -1,4 +1,4 @@
-import { Country } from "./types/country";
+import type { Country } from "./types/country";
 
 export type ExternalLink = {
   label: string;
@@ -21,6 +21,7 @@ export type Profile = {
   location: string;
   about: string;
   website?: ExternalLink;
+  avatar?: MediaResource[] | null;
 };
 
 export type WorkEntry = {
@@ -93,6 +94,12 @@ export const LINK: ReadCV = {
       label: "website.com",
       url: "salmoon.vercel.app",
     },
+    avatar: [
+      {
+        src: "/images/placeholder.webp",
+        alt: "Salman Alfarisi",
+      },
+    ],
   },
   work: [
     {
@@ -113,6 +120,7 @@ export const LINK: ReadCV = {
       year: 2024,
       subtitle: "Collaboration with Mia Rahma and Dimas Putra",
       url: "read.cv/msafdev",
+      images: [{ src: "/images/placeholder.webp", alt: "Placeholder" }],
     },
   ],
   speaking: [
@@ -122,6 +130,10 @@ export const LINK: ReadCV = {
       location: "San Francisco, CA",
       subtitle: "Config 2024",
       url: "read.cv/config-2024",
+      images: [
+        { src: "/images/placeholder.webp", alt: "Placeholder" },
+        { src: "/images/placeholder.webp", alt: "Placeholder" },
+      ],
     },
   ],
   sideProjects: [
@@ -129,6 +141,10 @@ export const LINK: ReadCV = {
       title: "Nature Walks",
       year: 2021,
       subtitle: "Photo journal exploring city greens",
+      images: [
+        { src: "/images/placeholder.webp", alt: "Placeholder" },
+        { src: "/images/placeholder.webp", alt: "Placeholder" },
+      ]
     },
     {
       title: "Interactive Art Installation",
@@ -151,8 +167,9 @@ export const LINK: ReadCV = {
     },
   ],
   contact: [
-    { label: "Threads", value: "@salmoon" },
-    { label: "Instagram", value: "@salmoon.design" },
-    { label: "X", value: "@salmoon" },
+    { label: "Threads", value: "@salmoon", url: "example.com" },
+    { label: "Instagram", value: "@salmoon.design", url: "example.com" },
+    { label: "Twitter", value: "@salmoon", url: "example.com" },
+    { label: "Email", value: "msafdev@example.com", url: "example.com" },
   ],
 };

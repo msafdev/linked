@@ -9,6 +9,10 @@ import {
   type SectionInitialValuesMap,
   sectionSchemas,
 } from "@/lib/dashboard-forms";
+import {
+  getAllSectionValues,
+  updateSectionValues,
+} from "@/lib/dashboard-form-state";
 import { sectionRenderers } from "./sections";
 
 type SectionFormProps<K extends DashboardState = DashboardState> = {
@@ -38,7 +42,12 @@ export function SectionForm<K extends DashboardState>({
       enableReinitialize
       validate={(values) => zodValidate(schema, values)}
       onSubmit={(values, helpers) => {
-        console.log({ section: stateKey, values });
+        updateSectionValues(stateKey, values);
+        console.log({
+          section: stateKey,
+          values,
+          allSections: getAllSectionValues(),
+        });
         helpers.setSubmitting(false);
       }}
     >
@@ -46,7 +55,7 @@ export function SectionForm<K extends DashboardState>({
         <form className="w-full" onSubmit={formik.handleSubmit}>
           {renderSection(formik)}
           
-          <div className="flex justify-center gap-3 border-b-2 border-dashed py-6">
+          <div className="flex justify-center gap-3 pt-6">
             <Button
               type="button"
               variant="secondary"

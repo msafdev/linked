@@ -1,4 +1,4 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Link from "next/link";
 import { TbLink } from "react-icons/tb";
 
@@ -18,19 +18,35 @@ export default function Home() {
     COUNTRIES.find((country) => country.value === LINK.profile.location) ??
     null;
   const profileLocationLabel = profileCountry?.label ?? null;
+  const profileAvatar = LINK.profile.avatar ?? null;
+  const profileAvatarSrc =
+    profileAvatar?.src && profileAvatar.src.trim().length > 0
+      ? profileAvatar.src
+      : undefined;
+  const profileAvatarAlt =
+    profileAvatar?.alt && profileAvatar.alt.trim().length > 0
+      ? profileAvatar.alt
+      : LINK.profile.name;
+  const profileInitials =
+    LINK.profile.name
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("")
+      .slice(0, 2) || "??";
 
   return (
     <main className="min-h-svh w-full bg-background text-sm text-foreground">
       <div className="mx-auto flex w-full max-w-2xl flex-col px-6 py-12 sm:px-8 sm:py-16">
         <header className="flex md:flex-row flex-col md:items-start gap-4 md:gap-8 mb-12">
           <Avatar className="size-16 border border-border">
-            <AvatarImage src="https://github.com/msafdev.png" />
-            <AvatarFallback>SA</AvatarFallback>
+            <AvatarImage src={profileAvatarSrc} alt={profileAvatarAlt} />
+            <AvatarFallback>{profileInitials}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <h1 className="text-xl font-medium mb-0.5">{LINK.profile.name}</h1>
             <p className="text-sm text-muted-foreground mb-1.5">
-              {LINK.profile.title} 📍{" "}
+              {LINK.profile.title} ·{" "}
               {profileLocationLabel ?? LINK.profile.location}
             </p>
             {LINK.profile.website && (
@@ -166,7 +182,9 @@ export default function Home() {
                         >
                           <Image
                             src={image.src}
-                            alt={image.alt || `${piece.title} image ${index + 1}`}
+                            alt={
+                              image.alt || `${piece.title} image ${index + 1}`
+                            }
                             fill
                             sizes="192px"
                             className="object-cover"
@@ -232,7 +250,9 @@ export default function Home() {
                         >
                           <Image
                             src={image.src}
-                            alt={image.alt || `${talk.title} image ${index + 1}`}
+                            alt={
+                              image.alt || `${talk.title} image ${index + 1}`
+                            }
                             fill
                             sizes="192px"
                             className="object-cover"
@@ -283,34 +303,37 @@ export default function Home() {
                         </h3>
                       )}
                     </div>
-                  {project.subtitle && (
-                    <p className="text-xs text-muted-foreground">
-                      {project.subtitle}
-                    </p>
-                  )}
-                  {project.images && project.images.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-4">
-                      {project.images.map((image, index) => (
-                        <div
-                          key={`${index}-${image.src}`}
-                          className="relative w-full aspect-video max-w-48 overflow-hidden rounded-md bg-muted"
-                        >
-                          <Image
-                            src={image.src}
-                            alt={image.alt || `${project.title} image ${index + 1}`}
-                            fill
-                            sizes="192px"
-                            className="object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+                    {project.subtitle && (
+                      <p className="text-xs text-muted-foreground">
+                        {project.subtitle}
+                      </p>
+                    )}
+                    {project.images && project.images.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-4">
+                        {project.images.map((image, index) => (
+                          <div
+                            key={`${index}-${image.src}`}
+                            className="relative w-full aspect-video max-w-48 overflow-hidden rounded-md bg-muted"
+                          >
+                            <Image
+                              src={image.src}
+                              alt={
+                                image.alt ||
+                                `${project.title} image ${index + 1}`
+                              }
+                              fill
+                              sizes="192px"
+                              className="object-cover"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         )}
 
         <section className="space-y-4 w-full mb-12">

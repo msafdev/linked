@@ -1,18 +1,16 @@
-"use client";
+﻿"use client";
 
-import { motion } from "motion/react";
 import type { FormikProps } from "formik";
-import { useState, type ReactNode } from "react";
-
-import { Button } from "@/components/ui/button";
-import { CollectionField, TextField } from "../fields";
-import type { SectionInitialValuesMap } from "@/lib/dashboard-forms";
+import { motion } from "motion/react";
+import { type ReactNode, useEffect, useState } from "react";
 import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
+
+import { SOCIAL_OPTIONS } from "@/components/input/social-picker";
+import { Button } from "@/components/ui/button";
+import type { SectionInitialValuesMap } from "@/lib/dashboard-forms";
 import { cn } from "@/lib/utils";
-import {
-  COLLAPSE_TRANSITION,
-  COLLAPSE_VARIANTS,
-} from "./collapsible";
+import { CollectionField, TextField } from "../fields";
+import { COLLAPSE_TRANSITION, COLLAPSE_VARIANTS } from "./collapsible";
 
 type ContactFormik = FormikProps<SectionInitialValuesMap["contact"]>;
 
@@ -56,13 +54,45 @@ function ContactEntry({
   removeEntry,
 }: ContactEntryProps): ReactNode {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const labelFieldName = `contact.${entryIndex}.label` as const;
+  const valueFieldName = `contact.${entryIndex}.value` as const;
+  const urlFieldName = `contact.${entryIndex}.url` as const;
+
+  const labelMeta = formik.getFieldMeta<string>(labelFieldName);
+
+  const selectedOption =
+    SOCIAL_OPTIONS.find((option) => option.value === (labelMeta.value ?? "")) ??
+    null;
+
+  useEffect(() => {
+    if (!selectedOption) {
+      return;
+    }
+    const currentUrl =
+      formik.values.contact?.[entryIndex]?.url?.toString() ?? "";
+
+    if (selectedOption.urlPrefix === "mailto:") {
+      if (!currentUrl || !currentUrl.startsWith("mailto:")) {
+        formik.setFieldValue(urlFieldName, "mailto:");
+      }
+      return;
+    }
+
+    if (
+      !currentUrl ||
+      currentUrl === "mailto:" ||
+      !/^https?:\/\//i.test(currentUrl)
+    ) {
+      formik.setFieldValue(urlFieldName, "https://");
+    }
+  }, [selectedOption?.urlPrefix, selectedOption?.value]);
 
   return (
     <section className="w-full">
       <div
         className={cn(
           "header flex items-center justify-between gap-3",
-          entryIndex !== 0 && "border-t-0"
+          entryIndex !== 0 && "border-t-0",
         )}
       >
         <h3>
@@ -99,30 +129,38 @@ function ContactEntry({
         animate={isCollapsed ? "collapsed" : "expanded"}
         variants={COLLAPSE_VARIANTS}
         transition={COLLAPSE_TRANSITION}
-        className="overflow-hidden"
         style={{ pointerEvents: isCollapsed ? "none" : "auto" }}
       >
         <div className="space-y-6 border-b-2 border-dashed pb-6">
           <TextField
             formik={formik}
             label="Label"
-            name={`contact.${entryIndex}.label`}
-            placeholder="Email"
+            name={labelFieldName}
+            placeholder="Select a platform"
+            as="social"
           />
           <TextField
             formik={formik}
             label="Value"
-            name={`contact.${entryIndex}.value`}
-            placeholder="you@example.com"
+            name={valueFieldName}
+            placeholder={
+              selectedOption?.valuePlaceholder ?? "Enter contact value"
+            }
+            type={selectedOption?.urlPrefix === "mailto:" ? "email" : "text"}
           />
           <TextField
             formik={formik}
             label="URL"
-            name={`contact.${entryIndex}.url`}
-            placeholder="mailto:you@example.com"
+            name={urlFieldName}
+            placeholder={selectedOption?.urlPlaceholder ?? "example.com"}
+            as="url"
+            pre={selectedOption?.urlPrefix}
           />
         </div>
       </motion.div>
     </section>
   );
 }
+
+
+

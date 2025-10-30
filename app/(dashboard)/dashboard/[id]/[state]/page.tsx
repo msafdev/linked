@@ -61,12 +61,12 @@ export default function DashboardStatePage({
   return (
     <div className="mx-auto w-full max-w-4xl px-6 py-10 h-full flex justify-center flex-col">
       <header className="flex items-center mb-6 gap-4">
-        <div className="relative size-16 rounded-[12px] border overflow-hidden shrink-0">
+        <div className="relative size-16 rounded-full border overflow-hidden shrink-0">
           <Image
             fill
             src="/images/placeholder.webp"
             alt="Current profile image"
-            className="rounded-[12px] p-1"
+            className="rounded-full p-0.5"
           />
         </div>
         <div className="space-y-1">

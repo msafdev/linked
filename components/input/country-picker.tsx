@@ -19,7 +19,7 @@ export type Country = {
   region: string;
 };
 
-export type CountrySelectProps = {
+export type CountryPickerProps = {
   value?: string;
   onChange: (next: string) => void; 
   countries: Country[];
@@ -27,13 +27,13 @@ export type CountrySelectProps = {
   className?: string;
 };
 
-export function CountrySelect({
+export function CountryPicker({
   value = "",
   onChange,
   countries,
   placeholder = "Select a country",
   className,
-}: CountrySelectProps) {
+}: CountryPickerProps) {
   const groups = countries.reduce<Record<string, Country[]>>((acc, c) => {
     (acc[c.region] ||= []).push(c);
     return acc;
@@ -63,4 +63,4 @@ export function CountrySelect({
   );
 }
 
-export default CountrySelect;
+export default CountryPicker;

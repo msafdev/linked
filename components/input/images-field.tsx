@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { FieldArray, type FormikProps } from "formik";
+import Image from "next/image";
 import { useRef, useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import {
   emptyEntryFactories,
@@ -19,6 +19,7 @@ type ImagesFieldProps<FormValues> = {
   images: ImageFormValues[];
   altPrefix?: string;
   aspects?: "video" | "square" | "auto";
+  maxItems?: number;
 };
 
 export function ImagesField<FormValues>({
@@ -27,6 +28,7 @@ export function ImagesField<FormValues>({
   images,
   altPrefix = "image",
   aspects = "video",
+  maxItems,
 }: ImagesFieldProps<FormValues>) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -39,10 +41,25 @@ export function ImagesField<FormValues>({
             return;
           }
 
+          const limit = typeof maxItems === "number" ? maxItems : null;
+          if (limit && images.length >= limit) {
+            setUploadError(
+              `You can upload up to ${limit} image${limit > 1 ? "s" : ""}.`
+            );
+            return;
+          }
+
           let encounteredError = false;
+          let limitExceeded = false;
           const existingCount = images.length;
+          let addedCount = 0;
 
           Array.from(fileList).forEach((file, index) => {
+            if (limit && existingCount + addedCount >= limit) {
+              limitExceeded = true;
+              return;
+            }
+
             if (
               !file.type.startsWith("image/") ||
               file.size > MAX_IMAGE_SIZE_BYTES
@@ -64,7 +81,17 @@ export function ImagesField<FormValues>({
               }
             };
             reader.readAsDataURL(file);
+            addedCount += 1;
           });
+
+          if (limitExceeded) {
+            setUploadError(
+              `You can upload up to ${limit ?? 0} image${
+                limit && limit > 1 ? "s" : ""
+              }.`
+            );
+            return;
+          }
 
           setUploadError(
             encounteredError
@@ -72,6 +99,9 @@ export function ImagesField<FormValues>({
               : null
           );
         };
+
+        const limit = typeof maxItems === "number" ? maxItems : null;
+        const hasReachedLimit = Boolean(limit && images.length >= limit);
 
         return (
           <section className="flex flex-col gap-6">
@@ -100,6 +130,8 @@ export function ImagesField<FormValues>({
                   variant="ghost"
                   size="icon"
                   onClick={() => fileInputRef.current?.click()}
+                  disabled={hasReachedLimit}
+                  className="disabled:opacity-50"
                 >
                   <PiPlusBold />
                 </Button>
@@ -116,17 +148,19 @@ export function ImagesField<FormValues>({
                       // biome-ignore lint/suspicious/noArrayIndexKey: FieldArray data relies on ordered indices.
                       imageIndex
                     }
-                    className="relative"
+                    className={cn(
+                      "relative rounded-[4px]",
+                      aspects ? `aspect-${aspects}` : "aspect-video"
+                    )}
                   >
                     {typeof image?.src === "string" && image.src ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={image.src}
                         alt={image.alt ?? `Image ${imageIndex + 1}`}
-                        className={cn(
-                          "aspect-video w-full object-cover rounded-[4px]",
-                          aspects && `aspect-${aspects}`
-                        )}
+                        fill
+                        sizes="200px"
+                        className="object-cover rounded"
+                        unoptimized
                       />
                     ) : (
                       <div className="flex aspect-square items-center justify-center text-xs text-muted-foreground">

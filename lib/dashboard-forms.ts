@@ -14,6 +14,18 @@ const optionalStringSchema = z
   .optional()
   .transform((value) => value ?? "");
 
+const imageSchema = z.object({
+  src: z.string().min(1, "Image source is required"),
+  alt: optionalStringSchema,
+});
+
+export type ImageFormValues = z.infer<typeof imageSchema>;
+
+const avatarSchema = z.object({
+  src: optionalStringSchema,
+  alt: optionalStringSchema,
+});
+
 export const profileSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
@@ -24,6 +36,7 @@ export const profileSchema = z
       label: optionalStringSchema,
       url: optionalUrlSchema,
     }),
+    avatar: avatarSchema,
   })
   .superRefine(({ website }, ctx) => {
     const hasLabel = website.label.trim().length > 0;
@@ -48,14 +61,11 @@ export const profileInitialValues: ProfileFormValues = {
     label: LINK.profile.website?.label ?? "",
     url: LINK.profile.website?.url ?? "",
   },
+  avatar: {
+    src: LINK.profile.avatar?.src ?? "",
+    alt: LINK.profile.avatar?.alt ?? "",
+  },
 };
-
-const imageSchema = z.object({
-  src: z.string().min(1, "Image source is required"),
-  alt: optionalStringSchema,
-});
-
-export type ImageFormValues = z.infer<typeof imageSchema>;
 
 const workRangeSchema = z.object({
   from: z.string().min(1, "Start date is required"),

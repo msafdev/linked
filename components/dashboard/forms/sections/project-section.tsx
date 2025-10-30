@@ -104,7 +104,7 @@ function ProjectEntry({
         animate={isCollapsed ? "collapsed" : "expanded"}
         variants={COLLAPSE_VARIANTS}
         transition={COLLAPSE_TRANSITION}
-        className="overflow-hidden"
+        
         style={{ pointerEvents: isCollapsed ? "none" : "auto" }}
       >
         <div className="flex flex-col gap-6">
