@@ -46,10 +46,11 @@ export function SectionForm<K extends DashboardState>({
         <form className="w-full" onSubmit={formik.handleSubmit}>
           {renderSection(formik)}
           
-          <div className="flex justify-center gap-4 border-b-2 border-dashed py-4">
+          <div className="flex justify-center gap-3 border-b-2 border-dashed py-6">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
+              className="border"
               size="sm"
               onClick={() => formik.resetForm()}
             >
