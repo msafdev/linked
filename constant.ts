@@ -200,7 +200,12 @@ export function getAllReadCvIds(): string[] {
 
 export const LINK: ReadCV = READ_CV_DATA[DEFAULT_USER_ID];
 
-export const SITE_BASE_URL = "https://site.com";
+const FALLBACK_SITE_URL = "http://localhost:3000";
+
+export const SITE_BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  process.env.SITE_URL ??
+  FALLBACK_SITE_URL;
 
 export function getLiveSiteUrl(domain: string): string {
   const cleaned = domain.trim().replace(/^\//, "").replace(/\/+$/g, "");

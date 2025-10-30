@@ -10,10 +10,13 @@ import {
   createSectionInitialValues,
   type SectionFormValuesMap,
 } from "@/lib/schema";
+
+type DashboardStateParams = {
+  state: string;
+};
+
 type DashboardStatePageProps = {
-  params: {
-    state: string;
-  };
+  params: Promise<DashboardStateParams>;
 };
 
 export const dynamicParams = false;
@@ -25,11 +28,12 @@ export function generateStaticParams() {
   }));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
-}: DashboardStatePageProps): Metadata {
+}: DashboardStatePageProps): Promise<Metadata> {
+  const { state } = await params;
   const label =
-    DASHBOARD_SECTIONS.find((section) => section.key === params.state)?.label ??
+    DASHBOARD_SECTIONS.find((section) => section.key === state)?.label ??
     "Dashboard";
   return {
     title: `${label} - Dashboard`,
@@ -39,7 +43,7 @@ export function generateMetadata({
 export default async function DashboardStatePage({
   params,
 }: DashboardStatePageProps) {
-  const { state } = params;
+  const { state } = await params;
 
   if (!isDashboardState(state)) {
     notFound();
@@ -123,7 +127,6 @@ export default async function DashboardStatePage({
     </div>
   );
 }
-
 
 
 
