@@ -9,6 +9,7 @@ import {
   type ImageFormValues,
 } from "@/lib/dashboard-forms";
 import { PiPlusBold, PiXBold } from "react-icons/pi";
+import { cn } from "@/lib/utils";
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -17,6 +18,7 @@ type ImagesFieldProps<FormValues> = {
   fieldArrayName: string;
   images: ImageFormValues[];
   altPrefix?: string;
+  aspects?: "video" | "square" | "auto";
 };
 
 export function ImagesField<FormValues>({
@@ -24,6 +26,7 @@ export function ImagesField<FormValues>({
   fieldArrayName,
   images,
   altPrefix = "image",
+  aspects = "video",
 }: ImagesFieldProps<FormValues>) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -120,7 +123,10 @@ export function ImagesField<FormValues>({
                       <img
                         src={image.src}
                         alt={image.alt ?? `Image ${imageIndex + 1}`}
-                        className="aspect-video w-full object-cover rounded-[4px]"
+                        className={cn(
+                          "aspect-video w-full object-cover rounded-[4px]",
+                          aspects && `aspect-${aspects}`
+                        )}
                       />
                     ) : (
                       <div className="flex aspect-square items-center justify-center text-xs text-muted-foreground">
