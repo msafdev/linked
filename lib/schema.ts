@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { LINK, type ReadCV } from "@/constant";
 import type { DashboardState } from "@/lib/config";
+import type { ReadCV } from "@/types/cv";
 
 const optionalUrlSchema = z
   .string()
@@ -10,13 +10,14 @@ const optionalUrlSchema = z
   .transform((value) => value ?? "");
 
 const optionalStringSchema = z
-  .string()
+  .union([z.string(), z.null()])
   .optional()
   .transform((value) => value ?? "");
 
 const imageSchema = z.object({
   src: z.string().min(1, "Image source is required"),
   alt: optionalStringSchema,
+  storagePath: optionalStringSchema,
 });
 
 export type ImageFormValues = z.infer<typeof imageSchema>;
@@ -28,10 +29,10 @@ const avatarSchema = z.object({
 
 export const profileSchema = z
   .object({
-    name: z.string().min(1, "Name is required"),
-    title: z.string().min(1, "Title is required"),
+    name: z.string().min(1, "Name is required").max(32, "Name must be 32 characters or fewer"),
+    title: z.string().min(1, "Title is required").max(32, "Title must be 32 characters or fewer"),
     location: z.string().min(1, "Location is required"),
-    about: z.string().min(1, "About is required"),
+    about: z.string().min(1, "About is required").max(500, "About must be 500 characters or fewer"),
     website: z.object({
       label: optionalStringSchema,
       url: optionalUrlSchema,
@@ -158,9 +159,10 @@ const settingsSchema = z.object({
   domain: z
     .string()
     .min(3, "Domain must be at least 3 characters")
-    .max(32, "Domain must be 32 characters or fewer")
+    .max(16, "Domain must be 16 characters or fewer")
     .regex(domainRegex, "Only letters and numbers are allowed"),
   billingStatus: z.string().min(1),
+  billingType: z.string().min(1),
 });
 
 export type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -187,28 +189,34 @@ export type SectionFormValuesMap = {
   settings: SettingsFormValues;
 };
 
-function normalizeAvatarSource(
-  avatar: ReadCV["profile"]["avatar"]
-): { src: string; alt: string } {
-  const avatarArray = Array.isArray(avatar)
-    ? avatar
-    : avatar
-    ? [avatar]
-    : [];
+function normalizeAvatarSource(avatar: ReadCV["profile"]["avatar"]): {
+  src: string;
+  alt: string;
+  storagePath: string;
+} {
+  const avatarArray = Array.isArray(avatar) ? avatar : avatar ? [avatar] : [];
   const firstAvatar = avatarArray[0] ?? null;
   return {
     src: firstAvatar?.src ?? "",
     alt: firstAvatar?.alt ?? "",
+    storagePath:
+      typeof (firstAvatar as { storagePath?: string })?.storagePath === "string"
+        ? ((firstAvatar as { storagePath?: string }).storagePath ?? "")
+        : "",
   };
 }
 
 function mapImages(
-  images: ReadCV["work"][number]["images"] | undefined
+  images: ReadCV["work"][number]["images"] | undefined,
 ): ImageFormValues[] {
   return (
     images?.map((image) => ({
       src: image?.src ?? "",
       alt: image?.alt ?? "",
+      storagePath:
+        typeof (image as { storagePath?: string })?.storagePath === "string"
+          ? ((image as { storagePath?: string }).storagePath ?? "")
+          : "",
     })) ?? []
   );
 }
@@ -277,7 +285,7 @@ export function createSpeakingInitialValues(data: ReadCV): SpeakingFormValues {
 }
 
 export function createSideProjectsInitialValues(
-  data: ReadCV
+  data: ReadCV,
 ): SideProjectsFormValues {
   return {
     projects:
@@ -292,7 +300,7 @@ export function createSideProjectsInitialValues(
 }
 
 export function createEducationInitialValues(
-  data: ReadCV
+  data: ReadCV,
 ): EducationFormValues {
   return {
     education:
@@ -308,9 +316,7 @@ export function createEducationInitialValues(
   };
 }
 
-export function createContactInitialValues(
-  data: ReadCV
-): ContactFormValues {
+export function createContactInitialValues(data: ReadCV): ContactFormValues {
   return {
     contact:
       data.contact?.map((entry) => ({
@@ -321,18 +327,15 @@ export function createContactInitialValues(
   };
 }
 
-export function createSettingsInitialValues(
-  data: ReadCV
-): SettingsFormValues {
+export function createSettingsInitialValues(data: ReadCV): SettingsFormValues {
   return {
     domain: (data.settings?.domain ?? data.id ?? "").toLowerCase(),
     billingStatus: data.settings?.billingStatus ?? "trial",
+    billingType: data.settings?.billingType ?? "free",
   };
 }
 
-export function createSectionInitialValues(
-  data: ReadCV
-): SectionFormValuesMap {
+export function createSectionInitialValues(data: ReadCV): SectionFormValuesMap {
   return {
     profile: createProfileInitialValues(data),
     work: createWorkInitialValues(data),
@@ -345,8 +348,31 @@ export function createSectionInitialValues(
   };
 }
 
+const EMPTY_READ_CV: ReadCV = {
+  id: "",
+  profile: {
+    name: "",
+    title: "",
+    location: "",
+    about: "",
+    website: undefined,
+    avatar: [],
+  },
+  work: [],
+  writing: [],
+  speaking: [],
+  sideProjects: [],
+  education: [],
+  contact: [],
+  settings: {
+    domain: "",
+    billingStatus: "trial",
+    billingType: "free",
+  },
+};
+
 export const defaultSectionInitialValues =
-  createSectionInitialValues(LINK);
+  createSectionInitialValues(EMPTY_READ_CV);
 
 export const emptyEntryFactories = {
   work: (): WorkEntryFormValues => ({
@@ -360,6 +386,7 @@ export const emptyEntryFactories = {
   image: (): ImageFormValues => ({
     src: "",
     alt: "",
+    storagePath: "",
   }),
   writing: (): WritingEntryFormValues => ({
     title: "",

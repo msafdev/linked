@@ -1,29 +1,39 @@
 "use client";
 
-import { motion } from "motion/react";
 import type { FormikProps } from "formik";
-import { useState, type ReactNode } from "react";
+import { motion } from "motion/react";
+
+import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
+
+import { type ReactNode, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { CollectionField, TextField } from "@/components/dashboard/forms/fields";
+
+import {
+  COLLAPSE_TRANSITION,
+  COLLAPSE_VARIANTS,
+} from "@/components/dashboard/collapsible";
+import {
+  CollectionField,
+  TextField,
+} from "@/components/dashboard/forms/fields";
+import { ImagesField } from "@/components/input/images-field";
+
 import type {
   SectionInitialValuesMap,
   SideProjectsFormValues,
 } from "@/lib/schema";
-import { ImagesField } from "@/components/input/images-field";
-import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import { COLLAPSE_TRANSITION, COLLAPSE_VARIANTS } from "@/components/dashboard/collapsible";
 
 type ProjectsFormik = FormikProps<SectionInitialValuesMap["projects"]>;
 
 export function renderProjectsSection(formik: ProjectsFormik): ReactNode {
   return (
-    <div className="space-y-6 w-full">
-      <section className="space-y-6 w-full">
+    <div className="w-full space-y-6">
+      <section className="w-full space-y-6">
         <div className="header">
           <h2>Side projects</h2>
-          <p className="text-sm text-muted-foreground font-normal mt-0.5">
+          <p className="text-muted-foreground mt-0.5 text-sm font-normal">
             Highlight your self-initiated work, experiments, and collaborations.
           </p>
         </div>
@@ -33,7 +43,7 @@ export function renderProjectsSection(formik: ProjectsFormik): ReactNode {
           emptyEntryKey="sideProjects"
           entryTitle="Project"
           addButtonLabel="Add project"
-          renderEntry={(entryIndex, removeEntry) => (
+          renderEntryAction={(entryIndex, removeEntry) => (
             <ProjectEntry
               entryIndex={entryIndex}
               formik={formik}
@@ -66,11 +76,11 @@ function ProjectEntry({
       <div
         className={cn(
           "header flex items-center justify-between gap-3",
-          entryIndex !== 0 && "border-t-0"
+          entryIndex !== 0 && "border-t-0",
         )}
       >
         <h3>
-          <span className="font-mono text-muted-foreground text-sm font-normal">{`${
+          <span className="text-muted-foreground font-mono text-sm font-normal">{`${
             entryIndex + 1
           }. `}</span>
           Project overview
@@ -116,7 +126,7 @@ function ProjectEntry({
             name={`projects.${entryIndex}.year`}
             placeholder="January 1st, 2024"
             as="date"
-            className="lg:col-span-4"
+            className="lg:col-span-4 w-[210px]"
           />
           <TextField
             formik={formik}

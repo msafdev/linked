@@ -1,20 +1,22 @@
 ﻿"use client";
 
 import type { FormikProps } from "formik";
+
 import type { ReactNode } from "react";
 
 import { TextField } from "@/components/dashboard/forms/fields";
+
 import type { SectionInitialValuesMap } from "@/lib/schema";
 
 type ProfileFormik = FormikProps<SectionInitialValuesMap["profile"]>;
 
 export function renderProfileSection(formik: ProfileFormik): ReactNode {
   return (
-    <div className="space-y-6 w-full border-b-2 border-dashed pb-6">
-      <section className="space-y-6 w-full">
+    <div className="w-full space-y-6 border-b-2 border-dashed pb-6">
+      <section className="w-full space-y-6">
         <div className="header">
           <h2>Profile basics</h2>
-          <p className="text-sm text-muted-foreground font-normal mt-0.5">
+          <p className="text-muted-foreground mt-0.5 text-sm font-normal">
             Share some basic information about yourself.
           </p>
         </div>
@@ -53,7 +55,7 @@ export function renderProfileSection(formik: ProfileFormik): ReactNode {
           as="url"
         />
       </section>
-      <section className="space-y-6 w-full">
+      <section className="w-full space-y-6">
         <h2 className="header">Summary</h2>
         <TextField
           formik={formik}

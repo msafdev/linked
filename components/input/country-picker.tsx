@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   Select,
   SelectContent,
@@ -10,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { cn } from "@/lib/utils";
 
 export type Country = {
@@ -21,7 +21,7 @@ export type Country = {
 
 export type CountryPickerProps = {
   value?: string;
-  onChange: (next: string) => void; 
+  onChange: (next: string) => void;
   countries: Country[];
   placeholder?: string;
   className?: string;
@@ -35,7 +35,12 @@ export function CountryPicker({
   className,
 }: CountryPickerProps) {
   const groups = countries.reduce<Record<string, Country[]>>((acc, c) => {
-    (acc[c.region] ||= []).push(c);
+    const existing = acc[c.region];
+    if (existing) {
+      existing.push(c);
+    } else {
+      acc[c.region] = [c];
+    }
     return acc;
   }, {});
 

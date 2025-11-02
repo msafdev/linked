@@ -1,25 +1,37 @@
 "use client";
 
+import { type FormikProps, getIn } from "formik";
 import { motion } from "motion/react";
-import type { FormikProps } from "formik";
-import { useState, type ReactNode } from "react";
+
+import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
+
+import { type ReactNode, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { CollectionField, TextField } from "@/components/dashboard/forms/fields";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+
+import {
+  COLLAPSE_TRANSITION,
+  COLLAPSE_VARIANTS,
+} from "@/components/dashboard/collapsible";
+import {
+  CollectionField,
+  TextField,
+} from "@/components/dashboard/forms/fields";
+
 import type { SectionInitialValuesMap } from "@/lib/schema";
-import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import { COLLAPSE_TRANSITION, COLLAPSE_VARIANTS } from "@/components/dashboard/collapsible";
 
 type EducationFormik = FormikProps<SectionInitialValuesMap["education"]>;
 
 export function renderEducationSection(formik: EducationFormik): ReactNode {
   return (
-    <div className="space-y-6 w-full">
-      <section className="space-y-6 w-full">
+    <div className="w-full space-y-6">
+      <section className="w-full space-y-6">
         <div className="header">
           <h2>Education</h2>
-          <p className="text-sm text-muted-foreground font-normal mt-0.5">
+          <p className="text-muted-foreground mt-0.5 text-sm font-normal">
             Document your academic background and formal training.
           </p>
         </div>
@@ -28,7 +40,7 @@ export function renderEducationSection(formik: EducationFormik): ReactNode {
           name="education"
           emptyEntryKey="education"
           entryTitle="Education"
-          renderEntry={(entryIndex, removeEntry) => (
+          renderEntryAction={(entryIndex, removeEntry) => (
             <EducationEntry
               entryIndex={entryIndex}
               formik={formik}
@@ -53,17 +65,32 @@ function EducationEntry({
   removeEntry,
 }: EducationEntryProps): ReactNode {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const endFieldPath = `education.${entryIndex}.range.to` as const;
+  const isPresent = getIn(formik.values, endFieldPath) === null;
+  const presentCheckboxId = `education-${entryIndex}-present`;
+
+  const handlePresentToggle = (checked: boolean | "indeterminate") => {
+    const nextChecked = checked === true;
+    formik.setFieldTouched(endFieldPath, true, false);
+    formik.setFieldError(endFieldPath, undefined);
+
+    if (nextChecked) {
+      formik.setFieldValue(endFieldPath, null);
+    } else {
+      formik.setFieldValue(endFieldPath, "");
+    }
+  };
 
   return (
     <section className="w-full">
       <div
         className={cn(
           "header flex items-center justify-between gap-3",
-          entryIndex !== 0 && "border-t-0"
+          entryIndex !== 0 && "border-t-0",
         )}
       >
         <h3>
-          <span className="font-mono text-muted-foreground text-sm font-normal">{`${
+          <span className="text-muted-foreground font-mono text-sm font-normal">{`${
             entryIndex + 1
           }. `}</span>
           Program details
@@ -115,7 +142,7 @@ function EducationEntry({
             name={`education.${entryIndex}.location`}
             placeholder="Jakarta, Indonesia"
           />
-          <section className="space-y-6 w-full pb-6 border-b-2 border-dashed">
+          <section className="w-full space-y-6 border-b-2 border-dashed pb-6">
             <h3 className="header">Timeline</h3>
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <TextField
@@ -124,16 +151,31 @@ function EducationEntry({
                 name={`education.${entryIndex}.range.from`}
                 placeholder="From"
                 as="date"
-                className="lg:col-span-4"
+                className="lg:col-span-5 w-[210px]"
               />
               <TextField
                 formik={formik}
                 label="End"
-                name={`education.${entryIndex}.range.to`}
+                name={endFieldPath}
                 placeholder="Present"
                 as="date"
-                className="lg:col-span-4"
+                disabled={isPresent}
+                className="lg:col-span-5 w-[210px]"
               />
+              <div className="lg:col-span-5 flex items-center gap-2">
+                <Checkbox
+                  id={presentCheckboxId}
+                  checked={isPresent}
+                  onCheckedChange={handlePresentToggle}
+                  aria-label="Mark education as ongoing"
+                />
+                <Label
+                  htmlFor={presentCheckboxId}
+                  className="text-sm font-medium"
+                >
+                  Present
+                </Label>
+              </div>
             </div>
           </section>
         </div>

@@ -1,9 +1,11 @@
 "use client";
 
-import * as React from "react";
 import { format } from "date-fns";
 
-import { cn } from "@/lib/utils";
+import { PiCalendarDotsDuotone } from "react-icons/pi";
+
+import * as React from "react";
+
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -11,7 +13,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { PiCalendarDotsDuotone } from "react-icons/pi";
+import { Portal } from "@/components/ui/portal";
+
+import { cn } from "@/lib/utils";
 
 export type DatePickerProps = {
   id?: string;
@@ -48,6 +52,7 @@ export function DatePicker({
 
   return (
     <Popover
+      modal
       open={open}
       onOpenChange={(nextOpen) => {
         setOpen(nextOpen);
@@ -64,15 +69,22 @@ export function DatePicker({
           disabled={disabled}
           data-empty={!value}
           className={cn(
-            "data-[empty=true]:text-muted-foreground w-[280px] justify-start text-left font-normal rounded-md",
-            className
+            "data-[empty=true]:text-muted-foreground w-[280px] justify-start rounded text-left font-normal",
+            className,
           )}
         >
-          <PiCalendarDotsDuotone className="-ml-1 mr-3 size-4 text-muted-foreground" aria-hidden="true" />
-          {value ? <span className="text-sm">{format(value, displayFormat)}</span> : placeholder}
+          <PiCalendarDotsDuotone
+            className="text-muted-foreground mr-3 -ml-1 size-4 shrink-0"
+            aria-hidden="true"
+          />
+          {value ? (
+            <span className="text-sm">{format(value, displayFormat)}</span>
+          ) : (
+            placeholder
+          )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <Portal className="w-auto p-0" align="start">
         <Calendar
           selected={value}
           onSelect={(date) => {
@@ -86,7 +98,7 @@ export function DatePicker({
           maxDate={maxDate}
           disabled={isDateDisabled}
         />
-      </PopoverContent>
+      </Portal>
     </Popover>
   );
 }

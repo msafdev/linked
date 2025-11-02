@@ -9,7 +9,7 @@ function cloneValues<T>(values: T): T {
 
 export function initializeUserSectionValues(
   userId: string,
-  initialValues: SectionFormValuesMap
+  initialValues: SectionFormValuesMap,
 ) {
   if (!aggregatedValuesByUser[userId]) {
     aggregatedValuesByUser[userId] = cloneValues(initialValues);
@@ -19,7 +19,7 @@ export function initializeUserSectionValues(
 export function updateSectionValues<K extends DashboardState>(
   userId: string,
   state: K,
-  values: SectionFormValuesMap[K]
+  values: SectionFormValuesMap[K],
 ) {
   if (!aggregatedValuesByUser[userId]) {
     aggregatedValuesByUser[userId] = {} as SectionFormValuesMap;
@@ -29,7 +29,7 @@ export function updateSectionValues<K extends DashboardState>(
 }
 
 export function getAllSectionValues(
-  userId: string
+  userId: string,
 ): SectionFormValuesMap | undefined {
   return aggregatedValuesByUser[userId];
 }

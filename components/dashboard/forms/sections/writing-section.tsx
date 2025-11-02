@@ -1,32 +1,39 @@
 "use client";
 
-import { motion } from "motion/react";
 import type { FormikProps } from "formik";
-import { useState, type ReactNode } from "react";
+import { motion } from "motion/react";
+
+import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
+
+import { type ReactNode, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { CollectionField, TextField } from "@/components/dashboard/forms/fields";
-import {
-  type SectionInitialValuesMap,
-  type WritingFormValues,
-} from "@/lib/schema";
-import { ImagesField } from "@/components/input/images-field";
-import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
-import { cn } from "@/lib/utils";
+
 import {
   COLLAPSE_TRANSITION,
   COLLAPSE_VARIANTS,
 } from "@/components/dashboard/collapsible";
+import {
+  CollectionField,
+  TextField,
+} from "@/components/dashboard/forms/fields";
+import { ImagesField } from "@/components/input/images-field";
+
+import {
+  type SectionInitialValuesMap,
+  type WritingFormValues,
+} from "@/lib/schema";
+import { cn } from "@/lib/utils";
 
 type WritingFormik = FormikProps<SectionInitialValuesMap["writing"]>;
 
 export function renderWritingSection(formik: WritingFormik): ReactNode {
   return (
-    <div className="space-y-6 w-full">
-      <section className="space-y-6 w-full">
+    <div className="w-full space-y-6">
+      <section className="w-full space-y-6">
         <div className="header">
           <h2>Published writing</h2>
-          <p className="text-sm text-muted-foreground font-normal mt-0.5">
+          <p className="text-muted-foreground mt-0.5 text-sm font-normal">
             Manage your published articles, posts, and other writing.
           </p>
         </div>
@@ -35,7 +42,7 @@ export function renderWritingSection(formik: WritingFormik): ReactNode {
           name="writing"
           emptyEntryKey="writing"
           entryTitle="Writing"
-          renderEntry={(entryIndex, removeEntry) => (
+          renderEntryAction={(entryIndex, removeEntry) => (
             <WritingEntry
               entryIndex={entryIndex}
               formik={formik}
@@ -68,11 +75,11 @@ function WritingEntry({
       <div
         className={cn(
           "header flex items-center justify-between gap-3",
-          entryIndex !== 0 && "border-t-0"
+          entryIndex !== 0 && "border-t-0",
         )}
       >
         <h3>
-          <span className="font-mono text-muted-foreground text-sm font-normal">{`${
+          <span className="text-muted-foreground font-mono text-sm font-normal">{`${
             entryIndex + 1
           }. `}</span>
           Writing entry
@@ -103,7 +110,6 @@ function WritingEntry({
         animate={isCollapsed ? "collapsed" : "expanded"}
         variants={COLLAPSE_VARIANTS}
         transition={COLLAPSE_TRANSITION}
-        
         style={{ pointerEvents: isCollapsed ? "none" : "auto" }}
       >
         <div className="flex flex-col gap-6">
@@ -119,7 +125,7 @@ function WritingEntry({
             name={`writing.${entryIndex}.year`}
             placeholder="Publication date"
             as="date"
-            className="lg:col-span-2"
+            className="lg:col-span-2 w-[210px]"
           />
           <TextField
             formik={formik}
@@ -141,7 +147,7 @@ function WritingEntry({
             fieldArrayName={`writing.${entryIndex}.images`}
             images={images}
             altPrefix={`writing-${entryIndex + 1}`}
-            aspects="square"
+            aspects="4/3"
           />
         </div>
       </motion.div>

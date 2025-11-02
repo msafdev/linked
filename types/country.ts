@@ -160,6 +160,14 @@ export const COUNTRIES: Country[] = [
 
 export const groupCountriesByRegion = (list: Country[]) =>
   list.reduce<Record<string, Country[]>>((acc, country) => {
-    (acc[country.region] ||= []).push(country);
+    const regionGroup = acc[country.region];
+    if (regionGroup) {
+      regionGroup.push(country);
+    } else {
+      acc[country.region] = [country];
+    }
+
     return acc;
   }, {});
+
+

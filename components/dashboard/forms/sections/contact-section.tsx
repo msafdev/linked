@@ -1,26 +1,36 @@
-﻿"use client";
+"use client";
 
 import type { FormikProps } from "formik";
 import { motion } from "motion/react";
-import { type ReactNode, useEffect, useState } from "react";
+
 import { PiCaretDownBold, PiCaretUpBold, PiTrashDuotone } from "react-icons/pi";
 
-import { SOCIAL_OPTIONS } from "@/components/input/social-picker";
+import { type ReactNode, useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
+
+import {
+  COLLAPSE_TRANSITION,
+  COLLAPSE_VARIANTS,
+} from "@/components/dashboard/collapsible";
+import {
+  CollectionField,
+  TextField,
+} from "@/components/dashboard/forms/fields";
+import { SOCIAL_OPTIONS } from "@/components/input/social-picker";
+
 import type { SectionInitialValuesMap } from "@/lib/schema";
 import { cn } from "@/lib/utils";
-import { CollectionField, TextField } from "@/components/dashboard/forms/fields";
-import { COLLAPSE_TRANSITION, COLLAPSE_VARIANTS } from "@/components/dashboard/collapsible";
 
 type ContactFormik = FormikProps<SectionInitialValuesMap["contact"]>;
 
 export function renderContactSection(formik: ContactFormik): ReactNode {
   return (
-    <div className="space-y-6 w-full">
-      <section className="space-y-6 w-full">
+    <div className="w-full space-y-6">
+      <section className="w-full space-y-6">
         <div className="header">
           <h2>Contact methods</h2>
-          <p className="text-sm text-muted-foreground font-normal mt-0.5">
+          <p className="text-muted-foreground mt-0.5 text-sm font-normal">
             Add ways for people to reach you across platforms.
           </p>
         </div>
@@ -29,7 +39,7 @@ export function renderContactSection(formik: ContactFormik): ReactNode {
           name="contact"
           emptyEntryKey="contact"
           entryTitle="Contact"
-          renderEntry={(entryIndex, removeEntry) => (
+          renderEntryAction={(entryIndex, removeEntry) => (
             <ContactEntry
               entryIndex={entryIndex}
               formik={formik}
@@ -96,7 +106,7 @@ function ContactEntry({
         )}
       >
         <h3>
-          <span className="font-mono text-muted-foreground text-sm">{`${
+          <span className="text-muted-foreground font-mono text-sm">{`${
             entryIndex + 1
           }. `}</span>
           Contact detail
@@ -161,6 +171,3 @@ function ContactEntry({
     </section>
   );
 }
-
-
-

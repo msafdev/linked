@@ -4,12 +4,14 @@ import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
 import { SectionForm } from "@/components/dashboard/forms/section-form";
-import { DEFAULT_USER_ID, getReadCvById } from "@/constant";
+
+import { decodeJwtPayload, isTokenExpired } from "@/lib/auth/token";
 import { DASHBOARD_SECTIONS, isDashboardState } from "@/lib/config";
 import {
-  createSectionInitialValues,
   type SectionFormValuesMap,
+  createSectionInitialValues,
 } from "@/lib/schema";
+import { fetchPortfolioByAccountId } from "@/lib/supabase/portfolio";
 
 type DashboardStateParams = {
   state: string;
@@ -36,13 +38,23 @@ export async function generateMetadata({
     DASHBOARD_SECTIONS.find((section) => section.key === state)?.label ??
     "Dashboard";
   return {
-    title: `${label} - Dashboard`,
+    title: `${label} settings`,
+    description: `Update your ${label.toLowerCase()} details in the Linked dashboard.`,
+    robots: {
+      index: false,
+    },
+    openGraph: {
+      title: `${label} settings`,
+      description: `Update your ${label.toLowerCase()} details in the Linked dashboard.`,
+    },
+    twitter: {
+      title: `${label} settings`,
+      description: `Update your ${label.toLowerCase()} details in the Linked dashboard.`,
+    },
   };
 }
 
-export default async function DashboardStatePage({
-  params,
-}: DashboardStatePageProps) {
+export default async function Page({ params }: DashboardStatePageProps) {
   const { state } = await params;
 
   if (!isDashboardState(state)) {
@@ -50,25 +62,30 @@ export default async function DashboardStatePage({
   }
 
   const cookieStore = await cookies();
-  const existingCookie = cookieStore.get("dashboard-id");
-  const cookieId = existingCookie?.value ?? DEFAULT_USER_ID;
+  const accessToken = cookieStore.get("sb-access-token")?.value ?? "";
 
-  let userData = getReadCvById(cookieId);
+  const dashboardRedirect = `/dashboard/${state}`;
 
-  if (!userData) {
-    userData = getReadCvById(DEFAULT_USER_ID);
+  if (!accessToken) {
+    redirect(`/auth/login?redirect=${encodeURIComponent(dashboardRedirect)}`);
   }
+
+  const payload = decodeJwtPayload(accessToken);
+
+  if (
+    !payload?.sub ||
+    typeof payload.sub !== "string" ||
+    isTokenExpired(payload)
+  ) {
+    redirect(`/auth/login?redirect=${encodeURIComponent(dashboardRedirect)}`);
+  }
+
+  const accountId = payload.sub;
+
+  const userData = await fetchPortfolioByAccountId(accountId);
 
   if (!userData) {
     notFound();
-  }
-
-  if (existingCookie?.value !== userData.id) {
-    const searchParams = new URLSearchParams({
-      user: userData.id,
-      redirect: `/dashboard/${state}`,
-    });
-    redirect(`/api/dashboard-cookie?${searchParams.toString()}`);
   }
 
   const section = DASHBOARD_SECTIONS.find((item) => item.key === state);
@@ -84,8 +101,8 @@ export default async function DashboardStatePage({
   const avatarSource = Array.isArray(userData.profile.avatar)
     ? userData.profile.avatar[0]
     : userData.profile.avatar
-    ? userData.profile.avatar
-    : null;
+      ? userData.profile.avatar
+      : null;
 
   const avatarSrc =
     avatarSource?.src && avatarSource.src.trim().length > 0
@@ -108,11 +125,11 @@ export default async function DashboardStatePage({
           />
         </div>
         <div className="space-y-1">
-          <h1 className="text-xl font-semibold text-foreground">
+          <h1 className="text-foreground text-xl font-semibold">
             {userData.profile.name}
           </h1>
           {section.description ? (
-            <p className="text-xs text-muted-foreground sm:text-sm">
+            <p className="text-muted-foreground text-xs sm:text-sm">
               Edit and customize your {section.label.toLowerCase()} settings
             </p>
           ) : null}
@@ -127,6 +144,3 @@ export default async function DashboardStatePage({
     </div>
   );
 }
-
-
-

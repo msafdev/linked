@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import { Input } from "@/components/ui/input";
+
 import { cn } from "@/lib/utils";
 
 export type UrlInputProps = Omit<
@@ -35,9 +36,9 @@ const UrlInput = React.forwardRef<HTMLInputElement, UrlInputProps>(
         : value;
 
     return (
-      <div className={cn("flex w-full items-center rounded-md", className)}>
+      <div className={cn("flex w-full items-center rounded", className)}>
         {hasPrefix ? (
-          <span className="inline-flex items-center rounded-s-md border bg-muted px-3 text-sm text-muted-foreground h-full">
+          <span className="bg-muted text-muted-foreground inline-flex h-9 items-center rounded-s border px-3 text-sm">
             {prefix}
           </span>
         ) : null}

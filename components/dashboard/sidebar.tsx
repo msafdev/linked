@@ -1,9 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+
 import type { IconType } from "react-icons";
 import {
   PiAddressBookTabsDuotone,
@@ -16,6 +14,11 @@ import {
   PiNotebookDuotone,
   PiUserDuotone,
 } from "react-icons/pi";
+
+import { useState } from "react";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import type {
   DashboardSection,
@@ -59,13 +62,13 @@ export function DashboardSidebar({
     label: SEGMENT_LABELS[segment],
     items: sections.filter((section) => section.segment === segment),
   })).filter((group) => group.items.length > 0);
- 
+
   return (
-    <aside className="hidden md:flex items-center max-h-svh sticky top-0">
-      <nav className="flex flex-col flex-1 overflow-y-auto px-6 py-4 gap-4">
+    <aside className="sticky top-0 hidden max-h-svh items-center md:flex">
+      <nav className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-4">
         {groupedSections.map(({ segment, label, items }) => (
           <div key={segment}>
-            <span className="px-2 text-xs uppercase font-medium font-mono text-muted-foreground">
+            <span className="text-muted-foreground px-2 font-mono tracking-wide text-xs font-medium uppercase">
               {label}
             </span>
             <ul className="mt-3">
@@ -73,8 +76,9 @@ export function DashboardSidebar({
                 const href = `${basePath}/${key}`;
                 const isActive =
                   pathname === href || pathname?.startsWith(`${href}/`);
-                const shouldHighlight =
-                  hoveredKey ? hoveredKey === key : isActive;
+                const shouldHighlight = hoveredKey
+                  ? hoveredKey === key
+                  : isActive;
                 const IconComponent = ICONS[icon] ?? PiGridFourDuotone;
 
                 return (
@@ -83,8 +87,8 @@ export function DashboardSidebar({
                       href={href}
                       aria-current={isActive ? "page" : undefined}
                       className={cn(
-                        "group relative flex items-center px-2 py-2 rounded transition-colors min-w-40",
-                        isActive ? "text-foreground" : "text-muted-foreground"
+                        "group relative flex min-w-40 items-center rounded px-2 py-2 transition-colors",
+                        isActive ? "text-foreground" : "text-muted-foreground",
                       )}
                       onMouseEnter={() => setHoveredKey(key)}
                       onMouseLeave={() => setHoveredKey(null)}
@@ -92,7 +96,7 @@ export function DashboardSidebar({
                       {shouldHighlight && (
                         <motion.div
                           layoutId="sidebar-background"
-                          className="absolute inset-0 bg-muted rounded mix-blend-difference"
+                          className="bg-muted absolute inset-0 rounded mix-blend-difference"
                           transition={{
                             type: "spring",
                             stiffness: 300,
@@ -101,11 +105,9 @@ export function DashboardSidebar({
                           initial={false}
                         />
                       )}
-                      <span className="relative flex items-center gap-2.5 z-10">
+                      <span className="relative z-10 flex items-center gap-2.5">
                         <IconComponent className="size-3 shrink-0" />
-                        <span className="text-sm font-medium">
-                          {itemLabel}
-                        </span>
+                        <span className="text-sm">{itemLabel}</span>
                       </span>
                     </Link>
                   </li>
