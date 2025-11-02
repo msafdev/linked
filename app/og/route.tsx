@@ -3,8 +3,7 @@ import { ImageResponse } from "next/og";
 import { SITE_NAME } from "@/lib/site";
 
 export const runtime = "edge";
-export const contentType = "image/png";
-export const size = {
+const size = {
   width: 1200,
   height: 630,
 };
@@ -14,7 +13,6 @@ const FONT_CSS_URL =
 
 const fontDataPromise = fetch(FONT_CSS_URL, {
   headers: {
-    // Pretend to be a browser so Google returns the font CSS.
     "User-Agent":
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
   },
