@@ -6,6 +6,7 @@ import {
   setIn,
   useFormik,
 } from "formik";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -15,13 +16,14 @@ import { FcGoogle } from "react-icons/fc";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { authApi } from "@/api";
+import { authApi, authQueryKeys } from "@/api";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { DASHBOARD_BASE_PATH } from "@/lib/config";
 
 const registerSchema = z.object({
   email: z
@@ -55,8 +57,22 @@ const validateWithSchema = (values: RegisterFormValues) => {
   );
 };
 
-export function RegisterPage() {
+export function RegisterSection() {
   const searchParams = useSearchParams();
+  const defaultRedirect = `${DASHBOARD_BASE_PATH}/profile`;
+  const redirectTarget = searchParams.get("redirect") || defaultRedirect;
+
+  const { data: sessionData } = useQuery({
+    queryKey: authQueryKeys.session(),
+    queryFn: authApi.getSession,
+    staleTime: 1000 * 60,
+  });
+
+  useEffect(() => {
+    if (sessionData?.session) {
+      window.location.replace(redirectTarget);
+    }
+  }, [redirectTarget, sessionData]);
 
   const mutation = useMutation<
     { shouldRedirect: boolean },
@@ -124,7 +140,8 @@ export function RegisterPage() {
           | null = null;
 
         if (!requiresEmailConfirmation || sessionResponse?.session) {
-          const { data, error: authUserError } = await supabase.auth.getUser();
+          const { data, error: authUserError } =
+            await supabase.auth.getUser();
 
           if (authUserError) {
             throw authUserError;
@@ -145,14 +162,11 @@ export function RegisterPage() {
         }
 
         if (authUserData?.user) {
-          const redirect = searchParams.get("redirect");
-          if (redirect) {
-            window.location.replace(redirect);
-            return { shouldRedirect: true };
-          }
+          window.location.replace(redirectTarget);
+          return { shouldRedirect: true };
         }
 
-        window.location.replace("/dashboard/profile");
+        window.location.replace(redirectTarget);
         return { shouldRedirect: true };
       } catch (error) {
         toast.error(

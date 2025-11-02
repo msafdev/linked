@@ -147,7 +147,7 @@ function WritingEntry({
             fieldArrayName={`writing.${entryIndex}.images`}
             images={images}
             altPrefix={`writing-${entryIndex + 1}`}
-            aspects="4/3"
+            aspects="[4/3]"
           />
         </div>
       </motion.div>

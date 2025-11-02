@@ -3,17 +3,20 @@ import type { Metadata } from "next";
 import { FeaturesSection } from "@/components/app/sections/features-section";
 import { FooterSection } from "@/components/app/sections/footer-section";
 import { HomeSection } from "@/components/app/sections/home-section";
-import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
+
+import { SITE_DESCRIPTION } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Build and share a portfolio in minutes",
+  title: {
+    absolute: "Linked",
+  },
   description: SITE_DESCRIPTION,
   openGraph: {
-    title: `Build and share a portfolio in minutes | ${SITE_NAME}`,
+    title: `Linked`,
     description: SITE_DESCRIPTION,
   },
   twitter: {
-    title: `Build and share a portfolio in minutes | ${SITE_NAME}`,
+    title: `Linked`,
     description: SITE_DESCRIPTION,
   },
 };

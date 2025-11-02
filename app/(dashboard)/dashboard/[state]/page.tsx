@@ -38,17 +38,17 @@ export async function generateMetadata({
     DASHBOARD_SECTIONS.find((section) => section.key === state)?.label ??
     "Dashboard";
   return {
-    title: `${label} settings`,
+    title: `${label}`,
     description: `Update your ${label.toLowerCase()} details in the Linked dashboard.`,
     robots: {
       index: false,
     },
     openGraph: {
-      title: `${label} settings`,
+      title: `${label}`,
       description: `Update your ${label.toLowerCase()} details in the Linked dashboard.`,
     },
     twitter: {
-      title: `${label} settings`,
+      title: `${label}`,
       description: `Update your ${label.toLowerCase()} details in the Linked dashboard.`,
     },
   };

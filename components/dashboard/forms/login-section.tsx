@@ -6,6 +6,7 @@ import {
   setIn,
   useFormik,
 } from "formik";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -15,13 +16,14 @@ import { FcGoogle } from "react-icons/fc";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { authApi } from "@/api";
+import { authApi, authQueryKeys } from "@/api";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { DASHBOARD_BASE_PATH } from "@/lib/config";
 
 const loginSchema = z.object({
   email: z
@@ -57,10 +59,21 @@ const validateWithSchema = (values: LoginFormValues) => {
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
-export function LoginPage() {
+export function LoginSection() {
   const searchParams = useSearchParams();
+  const defaultRedirect = `${DASHBOARD_BASE_PATH}/profile`;
+  const redirectTarget = searchParams.get("redirect") || defaultRedirect;
+  const { data: sessionData } = useQuery({
+    queryKey: authQueryKeys.session(),
+    queryFn: authApi.getSession,
+    staleTime: 1000 * 60,
+  });
 
-  const redirectTarget = searchParams.get("redirect") || "/dashboard/profile";
+  useEffect(() => {
+    if (sessionData?.session) {
+      window.location.replace(redirectTarget);
+    }
+  }, [redirectTarget, sessionData]);
 
   const mutation = useMutation({
     mutationFn: async ({ email, password }: LoginFormValues) => {

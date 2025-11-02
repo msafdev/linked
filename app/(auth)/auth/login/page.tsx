@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 
-import { LoginPage } from "@/components/auth/login-page";
+import { LoginSection } from "@/components/dashboard/forms/login-section";
+
 import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Log in",
-  description: "Access your Linked dashboard to update your portfolio and manage published sections.",
+  description:
+    "Access your Linked dashboard to update your portfolio and manage published sections.",
   robots: {
     index: false,
   },
@@ -20,5 +22,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <LoginPage />;
+  return <LoginSection />;
 }

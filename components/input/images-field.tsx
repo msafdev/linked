@@ -27,7 +27,7 @@ type ImagesFieldProps<FormValues> = {
   fieldArrayName: string;
   images: ImageFormValues[];
   altPrefix?: string;
-  aspects?: "video" | "square" | "4/3" | "auto";
+  aspects?: "video" | "square" | "[4/3]" | "auto";
   maxItems?: number;
 };
 

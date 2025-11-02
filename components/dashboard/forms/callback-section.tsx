@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-export function AuthCallbackPage() {
+export function CallbackSection() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
