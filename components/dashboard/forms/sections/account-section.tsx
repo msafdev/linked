@@ -109,7 +109,7 @@ export function renderSettingsSection(formik: SettingsFormik): ReactNode {
           <div className="col-span-full flex items-center md:col-span-4">
             <div className="flex w-full items-center rounded">
               <span className="bg-muted text-muted-foreground inline-flex h-9 items-center rounded-s border px-3 text-sm">
-                {DOMAIN_PREFIX}/
+                linked.app/
               </span>
               <Input
                 id="settings-domain"
