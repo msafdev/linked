@@ -152,6 +152,7 @@ export async function POST(request: NextRequest) {
 
         const preferences = {
           sections: clonedDefaults,
+          template: defaultSettings.template,
         };
 
         await client.from("setting").insert({
@@ -329,7 +330,6 @@ export async function DELETE() {
 
   return response;
 }
-
 
 
 

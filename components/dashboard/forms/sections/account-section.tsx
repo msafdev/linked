@@ -16,11 +16,20 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { authApi } from "@/api";
 import type { SectionInitialValuesMap } from "@/lib/schema";
 import { SITE_BASE_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { PORTFOLIO_TEMPLATE_OPTIONS } from "@/lib/portfolio/templates-metadata";
+import { DEFAULT_PORTFOLIO_TEMPLATE_ID } from "@/types/portfolio-template";
 
 type SettingsFormik = FormikProps<SectionInitialValuesMap["settings"]>;
 
@@ -30,8 +39,12 @@ export function renderSettingsSection(formik: SettingsFormik): ReactNode {
   const domainValue = formik.values.domain ?? "";
   const billingStatus = formik.values.billingStatus ?? "";
   const billingType = formik.values.billingType ?? "";
-  const displayDomain =
-    domainValue && domainValue.length > 0 ? domainValue : "username";
+  const templateValue =
+    formik.values.template ?? DEFAULT_PORTFOLIO_TEMPLATE_ID;
+  const selectedTemplate =
+    PORTFOLIO_TEMPLATE_OPTIONS.find(
+      (option) => option.id === templateValue,
+    ) ?? PORTFOLIO_TEMPLATE_OPTIONS[0];
 
   const liveSiteHref =
     domainValue && domainValue.trim().length > 0
@@ -86,6 +99,47 @@ export function renderSettingsSection(formik: SettingsFormik): ReactNode {
 
   return (
     <div className="w-full">
+      <section className="mb-6 w-full space-y-6">
+        <div className="header">
+          <h2>Template</h2>
+          <p className="text-muted-foreground mt-0.5 font-sans text-sm font-normal">
+            Choose the public layout your portfolio uses.
+          </p>
+        </div>
+        <div className="grid grid-cols-8 gap-4">
+          <div className="col-span-full flex flex-col items-start justify-center md:col-span-4">
+            <Label htmlFor="settings-template" className="font-medium">
+              Layout
+            </Label>
+            <p className="text-muted-foreground mt-2 text-xs">
+              Switch between available templates any time.
+            </p>
+          </div>
+          <div className="col-span-full md:col-span-4">
+            <Select
+              value={templateValue}
+              onValueChange={(value) => formik.setFieldValue("template", value)}
+            >
+              <SelectTrigger id="settings-template" className="w-full">
+                <SelectValue placeholder="Select a template" />
+              </SelectTrigger>
+              <SelectContent>
+                {PORTFOLIO_TEMPLATE_OPTIONS.map((option) => (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {selectedTemplate?.description && (
+              <p className="text-muted-foreground mt-2 text-xs">
+                {selectedTemplate.description}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
       <section className="mb-6 w-full space-y-6">
         <div className="header">
           <h2>Domain</h2>

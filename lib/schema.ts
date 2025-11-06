@@ -2,6 +2,10 @@ import { z } from "zod";
 
 import type { DashboardState } from "@/lib/config";
 import type { ReadCV } from "@/types/cv";
+import {
+  DEFAULT_PORTFOLIO_TEMPLATE_ID,
+  PORTFOLIO_TEMPLATE_IDS,
+} from "@/types/portfolio-template";
 
 const optionalUrlSchema = z
   .string()
@@ -163,6 +167,7 @@ const settingsSchema = z.object({
     .regex(domainRegex, "Only letters and numbers are allowed"),
   billingStatus: z.string().min(1),
   billingType: z.string().min(1),
+  template: z.enum(PORTFOLIO_TEMPLATE_IDS),
 });
 
 export type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -332,6 +337,7 @@ export function createSettingsInitialValues(data: ReadCV): SettingsFormValues {
     domain: (data.settings?.domain ?? data.id ?? "").toLowerCase(),
     billingStatus: data.settings?.billingStatus ?? "trial",
     billingType: data.settings?.billingType ?? "free",
+    template: data.settings?.template ?? DEFAULT_PORTFOLIO_TEMPLATE_ID,
   };
 }
 
@@ -368,6 +374,7 @@ const EMPTY_READ_CV: ReadCV = {
     domain: "",
     billingStatus: "trial",
     billingType: "free",
+    template: DEFAULT_PORTFOLIO_TEMPLATE_ID,
   },
 };
 

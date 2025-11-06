@@ -10,6 +10,11 @@ import type {
   WorkEntry,
   WritingEntry,
 } from "@/types/cv";
+import {
+  DEFAULT_PORTFOLIO_TEMPLATE_ID,
+  PORTFOLIO_TEMPLATE_IDS,
+  type PortfolioTemplateId,
+} from "@/types/portfolio-template";
 
 import { extractAvatarSrcFromContent } from "../media";
 
@@ -40,6 +45,15 @@ const createSectionMap = (rows: SectionRow[]): SectionMap => {
 
 const safeArray = <T>(value: unknown): T[] => {
   return Array.isArray(value) ? (value as T[]) : [];
+};
+
+const isPortfolioTemplateId = (
+  value: unknown,
+): value is PortfolioTemplateId => {
+  return (
+    typeof value === "string" &&
+    (PORTFOLIO_TEMPLATE_IDS as readonly string[]).includes(value)
+  );
 };
 
 const mapReadCv = (
@@ -95,6 +109,19 @@ const mapReadCv = (
       settingsData.billingType) ||
     "free";
 
+  const preferences =
+    setting?.preferences && typeof setting.preferences === "object"
+      ? (setting.preferences as Record<string, unknown>)
+      : null;
+  const templateCandidates: unknown[] = [
+    (preferences as { template?: unknown } | null)?.template ?? null,
+    settingsData.template ?? null,
+  ];
+  const template =
+    templateCandidates.find((candidate): candidate is PortfolioTemplateId =>
+      isPortfolioTemplateId(candidate),
+    ) ?? DEFAULT_PORTFOLIO_TEMPLATE_ID;
+
   const websiteData = profileData.website as Partial<ExternalLink> | undefined;
   const website =
     websiteData &&
@@ -135,6 +162,7 @@ const mapReadCv = (
         (rawBillingStatus as ReadCV["settings"]["billingStatus"]) ?? "trial",
       billingType:
         (rawBillingType as ReadCV["settings"]["billingType"]) ?? "free",
+      template,
     },
   };
 };

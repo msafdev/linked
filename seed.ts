@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 
 import type { Database } from "./lib/supabase";
+import { DEFAULT_PORTFOLIO_TEMPLATE_ID } from "./types/portfolio-template";
 
 config({ path: ".env.local" });
 
@@ -196,6 +197,7 @@ const seed = async () => {
       data: {
         domain: "salmoon",
         billingStatus: "trial",
+        template: DEFAULT_PORTFOLIO_TEMPLATE_ID,
       },
     },
   ];
@@ -207,6 +209,7 @@ const seed = async () => {
     billing_type: "free",
     preferences: {
       theme: "dark",
+      template: DEFAULT_PORTFOLIO_TEMPLATE_ID,
     },
   };
 

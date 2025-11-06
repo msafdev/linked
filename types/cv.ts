@@ -1,4 +1,5 @@
 import type { Country } from "@/types/country";
+import type { PortfolioTemplateId } from "@/types/portfolio-template";
 
 export type ExternalLink = {
   label: string;
@@ -79,6 +80,7 @@ export type Settings = {
   domain: string;
   billingStatus: BillingStatus;
   billingType: BillingType;
+  template: PortfolioTemplateId;
 };
 
 export type ReadCV = {

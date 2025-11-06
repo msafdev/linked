@@ -25,7 +25,6 @@ import {
   sectionSchemas,
 } from "@/lib/schema";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import type { Database } from "@/lib/supabase/types";
 
 type SectionFormProps<K extends DashboardState = DashboardState> = {
   stateKey: K;
@@ -170,6 +169,7 @@ export function SectionForm<K extends DashboardState>({
           sections: JSON.parse(
             JSON.stringify(allSections),
           ) as SectionFormValuesMap,
+          template: settingsValues.template,
         };
 
         const { error: upsertSettingError } = await supabase
