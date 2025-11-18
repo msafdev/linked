@@ -141,8 +141,7 @@ const mapReadCv = (
     typeof setting?.is_public === "boolean"
       ? setting.is_public
       : (settingsData as { isPublic?: unknown })?.isPublic;
-  const isPublic =
-    typeof rawIsPublic === "boolean" ? rawIsPublic : true;
+  const isPublic = typeof rawIsPublic === "boolean" ? rawIsPublic : true;
 
   const preferences =
     setting?.preferences && typeof setting.preferences === "object"

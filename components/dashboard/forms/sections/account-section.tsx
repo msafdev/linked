@@ -26,10 +26,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 import { authApi } from "@/api";
+import { PORTFOLIO_TEMPLATE_OPTIONS } from "@/lib/portfolio/templates-metadata";
 import type { SectionInitialValuesMap } from "@/lib/schema";
 import { SITE_BASE_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";
-import { PORTFOLIO_TEMPLATE_OPTIONS } from "@/lib/portfolio/templates-metadata";
 import { DEFAULT_PORTFOLIO_TEMPLATE_ID } from "@/types/portfolio-template";
 
 type SettingsFormik = FormikProps<SectionInitialValuesMap["settings"]>;
@@ -40,13 +40,11 @@ export function renderSettingsSection(formik: SettingsFormik): ReactNode {
   const domainValue = formik.values.domain ?? "";
   const billingStatus = formik.values.billingStatus ?? "";
   const billingType = formik.values.billingType ?? "";
-  const templateValue =
-    formik.values.template ?? DEFAULT_PORTFOLIO_TEMPLATE_ID;
+  const templateValue = formik.values.template ?? DEFAULT_PORTFOLIO_TEMPLATE_ID;
   const isPublic = Boolean(formik.values.isPublic);
   const selectedTemplate =
-    PORTFOLIO_TEMPLATE_OPTIONS.find(
-      (option) => option.id === templateValue,
-    ) ?? PORTFOLIO_TEMPLATE_OPTIONS[0];
+    PORTFOLIO_TEMPLATE_OPTIONS.find((option) => option.id === templateValue) ??
+    PORTFOLIO_TEMPLATE_OPTIONS[0];
 
   const liveSiteHref =
     domainValue && domainValue.trim().length > 0
@@ -90,7 +88,7 @@ export function renderSettingsSection(formik: SettingsFormik): ReactNode {
 
   const domainError = getIn(formik.errors, "domain");
   const domainTouched = getIn(formik.touched, "domain");
-  
+
   const showDomainError =
     typeof domainError === "string" &&
     (formik.submitCount > 0 || Boolean(domainTouched));

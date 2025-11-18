@@ -122,7 +122,7 @@ function SpeakingEntry({
             name={`speaking.${entryIndex}.date`}
             placeholder="January 1st, 2025"
             as="date"
-            className="lg:col-span-2 w-[210px]"
+            className="w-[210px] lg:col-span-2"
           />
           <TextField
             formik={formik}

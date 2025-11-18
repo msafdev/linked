@@ -1,10 +1,9 @@
 const STORAGE_BUCKET =
   process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET ?? "images";
 
-const NEXT_PUBLIC_SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").replace(
-  /\/$/,
-  "",
-);
+const NEXT_PUBLIC_SUPABASE_URL = (
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
+).replace(/\/$/, "");
 const STORAGE_PUBLIC_BASE = NEXT_PUBLIC_SUPABASE_URL
   ? `${NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}`
   : "";

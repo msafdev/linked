@@ -43,5 +43,7 @@ export const createClient = () => {
 };
 
 export const createAdminClient = () => {
-  return createServerClientWithKey(process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!);
+  return createServerClientWithKey(
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!,
+  );
 };

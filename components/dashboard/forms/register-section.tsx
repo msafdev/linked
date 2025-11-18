@@ -1,23 +1,28 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   type FormikErrors,
   type FormikHelpers,
   setIn,
   useFormik,
 } from "formik";
-import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FaGithub } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { authApi, authQueryKeys } from "@/api";
+import { FaGithub } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+
+import { useEffect, useState } from "react";
+
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+import { authApi, authQueryKeys } from "@/api";
 import { redirectViaAuthCallback } from "@/lib/auth/callback";
 import { DASHBOARD_BASE_PATH } from "@/lib/config";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";

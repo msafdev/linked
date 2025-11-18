@@ -164,7 +164,7 @@ function WorkEntry({ entryIndex, formik, removeEntry }: WorkEntryProps) {
                 name={`work.${entryIndex}.range.from`}
                 placeholder="From"
                 as="date"
-                className="lg:col-span-5 w-[210px]"
+                className="w-[210px] lg:col-span-5"
               />
               <TextField
                 formik={formik}
@@ -173,9 +173,9 @@ function WorkEntry({ entryIndex, formik, removeEntry }: WorkEntryProps) {
                 placeholder="Present"
                 as="date"
                 disabled={isPresent}
-                className="lg:col-span-5 w-[210px]"
+                className="w-[210px] lg:col-span-5"
               />
-              <div className="lg:col-span-4 flex items-center gap-2">
+              <div className="flex items-center gap-2 lg:col-span-4">
                 <Checkbox
                   id={presentCheckboxId}
                   checked={isPresent}

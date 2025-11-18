@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export function FooterSection() {
   return (
     <footer className="relative flex w-full flex-col px-4 py-12 md:px-8 lg:px-16">
-      <div className="mx-auto flex w-full max-w-3xl flex-col items-center md:items-baseline gap-y-12 duration-500 ease-in-out">
+      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-y-12 duration-500 ease-in-out md:items-baseline">
         <div className="flex w-full flex-col gap-x-8 gap-y-12 md:flex-row md:justify-between">
           <div className="text-foreground flex w-full flex-col items-center md:items-start">
             <Logo className="text-foreground mb-2 h-10 w-16" />

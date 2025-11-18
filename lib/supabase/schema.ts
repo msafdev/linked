@@ -78,4 +78,3 @@ export type ContentRecord = z.infer<typeof contentSchema>;
 export type ContentUpsert = z.infer<typeof contentUpsertSchema>;
 export type SettingRecord = z.infer<typeof settingSchema>;
 export type SettingUpsert = z.infer<typeof settingUpsertSchema>;
-

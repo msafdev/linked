@@ -19,7 +19,9 @@ const fontDataPromise = fetch(FONT_CSS_URL, {
 })
   .then((response) => response.text())
   .then((css) => {
-    const fontUrlMatch = css.match(/src: url\((https:\/\/[^)]+)\) format\('woff2'\)/);
+    const fontUrlMatch = css.match(
+      /src: url\((https:\/\/[^)]+)\) format\('woff2'\)/,
+    );
     if (!fontUrlMatch) {
       throw new Error("Failed to locate Besley font URL for OG image.");
     }

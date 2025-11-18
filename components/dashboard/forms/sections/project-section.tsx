@@ -126,7 +126,7 @@ function ProjectEntry({
             name={`projects.${entryIndex}.year`}
             placeholder="January 1st, 2024"
             as="date"
-            className="lg:col-span-4 w-[210px]"
+            className="w-[210px] lg:col-span-4"
           />
           <TextField
             formik={formik}

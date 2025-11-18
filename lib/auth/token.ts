@@ -39,4 +39,3 @@ export const isTokenExpired = (payload: DecodedToken | null): boolean => {
 
   return payload.exp * 1000 < Date.now();
 };
-

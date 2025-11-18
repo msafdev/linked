@@ -69,11 +69,7 @@ export function SectionForm<K extends DashboardState>({
     initializeUserSectionValues(userId, allInitialValues);
   }, [userId, allInitialValues]);
 
-  const saveSectionMutation = useMutation<
-    void,
-    unknown,
-    MutationPayload<K>
-  >({
+  const saveSectionMutation = useMutation<void, unknown, MutationPayload<K>>({
     mutationKey: ["dashboard", "section", "save", userId, stateKey],
     mutationFn: async ({ values, allSections }: MutationPayload<K>) => {
       if (stateKey === "settings") {
@@ -195,7 +191,7 @@ export function SectionForm<K extends DashboardState>({
         {(formik) => (
           <form className="w-full" onSubmit={formik.handleSubmit}>
             <SectionValidationWatcher formik={formik} />
-            
+
             {renderSection(formik)}
 
             <div className="flex justify-center gap-3 pt-6">

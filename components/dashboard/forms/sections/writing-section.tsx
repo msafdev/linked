@@ -125,7 +125,7 @@ function WritingEntry({
             name={`writing.${entryIndex}.year`}
             placeholder="Publication date"
             as="date"
-            className="lg:col-span-2 w-[210px]"
+            className="w-[210px] lg:col-span-2"
           />
           <TextField
             formik={formik}

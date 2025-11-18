@@ -222,7 +222,7 @@ export function Calendar({
   );
 
   return (
-    <div className={cn("w-full bg-popover z-auto", className)}>
+    <div className={cn("bg-popover z-auto w-full", className)}>
       <div className="bg-accent mb-2 flex items-center justify-between gap-2 border-b p-2">
         <Button
           type="button"

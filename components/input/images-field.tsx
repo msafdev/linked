@@ -12,12 +12,12 @@ import { Button } from "@/components/ui/button";
 
 import { useSectionFormContext } from "@/components/dashboard/forms/section-form";
 
+import { type ImageFormValues, emptyEntryFactories } from "@/lib/schema";
 import {
   deleteImages,
   getPublicImageUrl,
   uploadImage,
 } from "@/lib/supabase/storage";
-import { type ImageFormValues, emptyEntryFactories } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;

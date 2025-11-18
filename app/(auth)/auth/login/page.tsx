@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
-
 import { Suspense } from "react";
 
+import type { Metadata } from "next";
+
 import { LoginSection } from "@/components/dashboard/forms/login-section";
+
 import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {

@@ -72,7 +72,7 @@ export function FeaturesSection() {
         </p>
       </div>
 
-      <div className="grid gap-4 xs:gap-6 xs:grid-cols-2">
+      <div className="xs:gap-6 xs:grid-cols-2 grid gap-4">
         {features.map((feature, index) => (
           <div
             key={feature.title}

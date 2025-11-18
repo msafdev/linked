@@ -169,5 +169,3 @@ export const groupCountriesByRegion = (list: Country[]) =>
 
     return acc;
   }, {});
-
-
