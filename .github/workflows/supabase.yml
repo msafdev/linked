@@ -1,0 +1,55 @@
+name: Ping Supabase to Prevent Pausing
+
+on:
+  schedule:
+    - cron: "0 9 * * 1,4" # Runs at 9:00 AM UTC every Monday and Thursday
+  workflow_dispatch: # Allows manual triggering from the GitHub UI
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Step 3: Install Supabase Client
+      - name: Install Supabase Client
+        run: npm install --no-save @supabase/supabase-js
+
+      # Step 4: Ping Supabase
+      - name: Ping Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} # Supabase project URL
+          SUPABASE_KEY: ${{ secrets.NEXT_SERVICE_ROLE_KEY }} # Supabase service role key
+        run: |
+          node --input-type=module <<'EOF'
+          import { createClient } from '@supabase/supabase-js';
+
+          const supabaseUrl = process.env.SUPABASE_URL;
+          const supabaseKey = process.env.SUPABASE_KEY;
+
+          if (!supabaseUrl || !supabaseKey) {
+            console.error('Missing SUPABASE_URL or SUPABASE_KEY');
+            process.exit(1);
+          }
+
+          const supabase = createClient(supabaseUrl, supabaseKey);
+
+          // Light-weight select to keep the project warm.
+          const { error } = await supabase.from('content').select('id').limit(1);
+
+          if (error) {
+            console.error('Error pinging Supabase:', error.message);
+            process.exit(1);
+          }
+
+          console.log('Ping successful');
+          EOF
