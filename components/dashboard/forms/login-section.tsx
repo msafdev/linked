@@ -6,12 +6,13 @@ import {
   setIn,
   useFormik,
 } from "formik";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+
+import { useEffect, useState } from "react";
 
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -22,8 +23,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { authApi, authQueryKeys } from "@/api";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { redirectViaAuthCallback } from "@/lib/auth/callback";
 import { DASHBOARD_BASE_PATH } from "@/lib/config";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const loginSchema = z.object({
   email: z
@@ -62,7 +64,10 @@ const normalizeEmail = (email: string) => email.trim().toLowerCase();
 export function LoginSection() {
   const searchParams = useSearchParams();
   const defaultRedirect = `${DASHBOARD_BASE_PATH}/profile`;
-  const redirectTarget = searchParams.get("redirect") || defaultRedirect;
+  const redirectParam = searchParams.get("redirect");
+  const redirectTarget = redirectParam?.startsWith("/")
+    ? redirectParam
+    : defaultRedirect;
   const { data: sessionData } = useQuery({
     queryKey: authQueryKeys.session(),
     queryFn: authApi.getSession,
@@ -70,44 +75,34 @@ export function LoginSection() {
   });
 
   useEffect(() => {
-    if (sessionData?.session) {
-      window.location.replace(redirectTarget);
+    if (!sessionData?.session) {
+      return;
     }
+
+    redirectViaAuthCallback(sessionData.session, redirectTarget);
   }, [redirectTarget, sessionData]);
 
   const mutation = useMutation({
     mutationFn: async ({ email, password }: LoginFormValues) => {
       const toastId = toast.loading("Signing you in");
       try {
-        const normalizedEmail = normalizeEmail(email);
-        await authApi.post({
-          data: {
-            email: normalizedEmail,
-            password,
-            mode: "login",
-          },
-        });
-
-        const sessionResponse = await authApi.createSession({
-          email: normalizedEmail,
+        const supabase = createSupabaseBrowserClient();
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: normalizeEmail(email),
           password,
-          mode: "login",
         });
 
-        if (sessionResponse.session) {
-          const supabase = createSupabaseBrowserClient();
-          const { error } = await supabase.auth.setSession({
-            access_token: sessionResponse.session.access_token,
-            refresh_token: sessionResponse.session.refresh_token,
-          });
+        if (error) {
+          throw error;
+        }
 
-          if (error) {
-            throw error;
-          }
+        if (!data.session) {
+          throw new Error("Unable to create a Supabase session.");
         }
 
         toast.success("Welcome back!", { id: toastId });
-        return sessionResponse;
+        redirectViaAuthCallback(data.session, redirectTarget);
+        return data.session;
       } catch (error) {
         toast.error(
           error instanceof Error
@@ -118,13 +113,55 @@ export function LoginSection() {
         throw error;
       }
     },
-    onSuccess: () => {
-      window.location.replace(redirectTarget);
-    },
     onError: (error) => {
       console.error("[Login Error]", error);
     },
   });
+
+  const [oauthProviderLoading, setOauthProviderLoading] = useState<
+    "google" | "github" | null
+  >(null);
+
+  const handleOAuthSignIn = async (provider: "google" | "github") => {
+    const providerLabels: Record<typeof provider, string> = {
+      google: "Google",
+      github: "GitHub",
+    };
+
+    setOauthProviderLoading(provider);
+    const toastId = toast.loading(`Redirecting to ${providerLabels[provider]}`);
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const redirectUrl = new URL("/api/auth/callback", window.location.origin);
+      redirectUrl.searchParams.set("redirect", redirectTarget);
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectUrl.toString(),
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.dismiss(toastId);
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to continue with the selected provider. Please try again.",
+        { id: toastId },
+      );
+      setOauthProviderLoading(null);
+    }
+  };
 
   const formik = useFormik<LoginFormValues>({
     initialValues: {
@@ -233,7 +270,12 @@ export function LoginSection() {
               variant="secondary"
               type="button"
               className="w-full sm:flex-1"
-              disabled={mutation.isPending || formik.isSubmitting}
+              disabled={
+                mutation.isPending ||
+                formik.isSubmitting ||
+                oauthProviderLoading !== null
+              }
+              onClick={() => handleOAuthSignIn("google")}
             >
               <FcGoogle className="mr-2 size-4" />
               Continue with Google
@@ -242,7 +284,12 @@ export function LoginSection() {
               variant="secondary"
               type="button"
               className="w-full sm:flex-1"
-              disabled={mutation.isPending || formik.isSubmitting}
+              disabled={
+                mutation.isPending ||
+                formik.isSubmitting ||
+                oauthProviderLoading !== null
+              }
+              onClick={() => handleOAuthSignIn("github")}
             >
               <FaGithub className="mr-2 size-4" />
               Continue with GitHub

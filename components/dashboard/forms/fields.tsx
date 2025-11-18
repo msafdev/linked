@@ -492,7 +492,7 @@ export function TextField<TValues extends FormikValues>({
                       onClick={(event) => {
                         event.stopPropagation();
                         void clearAvatar();
-                      }}
+                      }}   
                     >
                       <PiXBold className="size-3.5 text-white" />
                     </Button>

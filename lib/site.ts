@@ -1,4 +1,4 @@
-const FALLBACK_SITE_URL = "http://localhost:3001";
+const FALLBACK_SITE_URL = "http://localhost:8000";
 
 export const SITE_BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_SITE_URL;

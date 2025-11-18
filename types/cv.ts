@@ -81,6 +81,7 @@ export type Settings = {
   billingStatus: BillingStatus;
   billingType: BillingType;
   template: PortfolioTemplateId;
+  isPublic: boolean;
 };
 
 export type ReadCV = {

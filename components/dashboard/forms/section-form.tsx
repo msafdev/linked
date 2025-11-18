@@ -6,8 +6,7 @@ import type { ZodTypeAny } from "zod";
 
 import { createContext, useContext, useEffect, useMemo, useRef } from "react";
 
-import type { PostgrestError } from "@supabase/supabase-js";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 
@@ -33,18 +32,10 @@ type SectionFormProps<K extends DashboardState = DashboardState> = {
   allInitialValues: SectionFormValuesMap;
 };
 
-type SectionMetadata = {
-  hasContent: boolean;
-  hasSetting: boolean;
-};
-
 type MutationPayload<K extends DashboardState> = {
   values: SectionInitialValuesMap[K];
   allSections: SectionFormValuesMap;
 };
-
-const isMissingRow = (error: PostgrestError | null): boolean =>
-  Boolean(error && error.code === "PGRST116");
 
 type SectionFormContextValue = {
   userId: string;
@@ -69,80 +60,22 @@ export function SectionForm<K extends DashboardState>({
 }: SectionFormProps<K>) {
   const schema = sectionSchemas[stateKey] as ZodTypeAny | undefined;
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
-  const queryClient = useQueryClient();
   const sectionLabel = stateKey.charAt(0).toUpperCase() + stateKey.slice(1);
 
   useEffect(() => {
+    if (!userId) {
+      return;
+    }
     initializeUserSectionValues(userId, allInitialValues);
   }, [userId, allInitialValues]);
 
-  const metadataQueryKey = [
-    "dashboard",
-    "section",
-    "metadata",
-    userId,
-    stateKey,
-  ];
-
-  const metadataQuery = useQuery<SectionMetadata>({
-    queryKey: metadataQueryKey,
-    enabled: Boolean(userId),
-    staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const base: SectionMetadata = {
-        hasContent: false,
-        hasSetting: false,
-      };
-
-      const { data: contentRow, error: contentError } = await supabase
-        .from("content")
-        .select("id")
-        .eq("account_id", userId)
-        .eq("section", stateKey)
-        .maybeSingle();
-
-      if (contentError && !isMissingRow(contentError)) {
-        throw contentError;
-      }
-
-      if (contentRow?.id) {
-        base.hasContent = true;
-      }
-
-      if (stateKey === "settings") {
-        const { data: settingRow, error: settingError } = await supabase
-          .from("setting")
-          .select("id")
-          .eq("account_id", userId)
-          .maybeSingle();
-
-        if (settingError && !isMissingRow(settingError)) {
-          throw settingError;
-        }
-
-        if (settingRow?.id) {
-          base.hasSetting = true;
-        }
-      }
-
-      return base;
-    },
-  });
-
   const saveSectionMutation = useMutation<
-    SectionMetadata,
+    void,
     unknown,
     MutationPayload<K>
   >({
     mutationKey: ["dashboard", "section", "save", userId, stateKey],
     mutationFn: async ({ values, allSections }: MutationPayload<K>) => {
-      const metadata =
-        metadataQuery.data ??
-        ({
-          hasContent: false,
-          hasSetting: false,
-        } satisfies SectionMetadata);
-
       if (stateKey === "settings") {
         const settingsValues = values as SectionInitialValuesMap["settings"];
         const domain =
@@ -172,27 +105,31 @@ export function SectionForm<K extends DashboardState>({
           template: settingsValues.template,
         };
 
-        const { error: upsertSettingError } = await supabase
-          .from("setting")
-          .upsert(
-            {
-              account_id: userId,
-              domain: domain.length > 0 ? domain : null,
-              billing_status: settingsValues.billingStatus,
-              billing_type: settingsValues.billingType,
-              preferences,
-            },
-            { onConflict: "account_id" },
-          );
+        const updatePayload = {
+          domain: domain.length > 0 ? domain : null,
+          billing_status: settingsValues.billingStatus,
+          billing_type: settingsValues.billingType,
+          is_public: settingsValues.isPublic,
+          preferences,
+        };
 
-        if (upsertSettingError) {
-          throw upsertSettingError;
+        const { data: settingRow, error: updateSettingError } = await supabase
+          .from("setting")
+          .update(updatePayload)
+          .eq("account_id", userId)
+          .select("id")
+          .maybeSingle();
+
+        if (updateSettingError) {
+          throw updateSettingError;
         }
 
-        return {
-          hasContent: true,
-          hasSetting: true,
-        };
+        if (!settingRow?.id) {
+          const message =
+            "Could not update account settings because no settings record exists for this account.";
+          throw new Error(message);
+        }
+        return;
       }
 
       const { error: upsertContentError } = await supabase
@@ -209,17 +146,8 @@ export function SectionForm<K extends DashboardState>({
       if (upsertContentError) {
         throw upsertContentError;
       }
-
-      return {
-        hasContent: true,
-        hasSetting: metadata.hasSetting,
-      };
     },
-    onSuccess: (metadata) => {
-      queryClient.setQueryData<SectionMetadata>(
-        metadataQueryKey,
-        () => metadata,
-      );
+    onSuccess: () => {
       toast.success(`${sectionLabel} saved`);
     },
   });
@@ -251,7 +179,6 @@ export function SectionForm<K extends DashboardState>({
               allSections,
             });
           } catch (error) {
-            console.error("[SectionForm][Save Error]", error);
             toast.error(
               error instanceof Error
                 ? error.message || "Failed to save changes."
@@ -268,6 +195,7 @@ export function SectionForm<K extends DashboardState>({
         {(formik) => (
           <form className="w-full" onSubmit={formik.handleSubmit}>
             <SectionValidationWatcher formik={formik} />
+            
             {renderSection(formik)}
 
             <div className="flex justify-center gap-3 pt-6">

@@ -156,7 +156,7 @@ function ContactEntry({
             placeholder={
               selectedOption?.valuePlaceholder ?? "Enter contact value"
             }
-            type={selectedOption?.urlPrefix === "mailto:" ? "email" : "text"}
+            type="text"
           />
           <TextField
             formik={formik}

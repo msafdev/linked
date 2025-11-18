@@ -1,29 +1,26 @@
 "use client";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   type FormikErrors,
   type FormikHelpers,
   setIn,
   useFormik,
 } from "formik";
-import { useEffect } from "react";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaGithub } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { FaGithub } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-
-import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
-
+import { authApi, authQueryKeys } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-import { authApi, authQueryKeys } from "@/api";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { redirectViaAuthCallback } from "@/lib/auth/callback";
 import { DASHBOARD_BASE_PATH } from "@/lib/config";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const registerSchema = z.object({
   email: z
@@ -60,8 +57,10 @@ const validateWithSchema = (values: RegisterFormValues) => {
 export function RegisterSection() {
   const searchParams = useSearchParams();
   const defaultRedirect = `${DASHBOARD_BASE_PATH}/profile`;
-  const redirectTarget = searchParams.get("redirect") || defaultRedirect;
-
+  const redirectParam = searchParams.get("redirect");
+  const redirectTarget = redirectParam?.startsWith("/")
+    ? redirectParam
+    : defaultRedirect;
   const { data: sessionData } = useQuery({
     queryKey: authQueryKeys.session(),
     queryFn: authApi.getSession,
@@ -69,9 +68,11 @@ export function RegisterSection() {
   });
 
   useEffect(() => {
-    if (sessionData?.session) {
-      window.location.replace(redirectTarget);
+    if (!sessionData?.session) {
+      return;
     }
+
+    redirectViaAuthCallback(sessionData.session, redirectTarget);
   }, [redirectTarget, sessionData]);
 
   const mutation = useMutation<
@@ -82,73 +83,25 @@ export function RegisterSection() {
     mutationFn: async ({ email, password }: RegisterFormValues) => {
       const toastId = toast.loading("Creating your account");
       try {
-        const normalizedEmail = email.trim().toLowerCase();
-
-        const payload = {
-          data: {
-            email: normalizedEmail,
-            password,
-            mode: "register" as const,
-          },
-        };
-
-        let sessionResponse: Awaited<
-          ReturnType<typeof authApi.createSession>
-        > | null = null;
-        let requiresEmailConfirmation = false;
-
-        try {
-          await authApi.put(payload);
-
-          sessionResponse = await authApi.createSession({
-            email: normalizedEmail,
-            password,
-            mode: "register",
-          });
-        } catch (sessionError) {
-          const message =
-            sessionError instanceof Error
-              ? sessionError.message
-              : String(sessionError ?? "");
-          const normalizedMessage = message.toLowerCase();
-          const needsConfirmation =
-            normalizedMessage.includes("email not confirmed") ||
-            normalizedMessage.includes("confirm your email");
-
-          if (needsConfirmation) {
-            requiresEmailConfirmation = true;
-          } else {
-            throw sessionError;
-          }
-        }
-
         const supabase = createSupabaseBrowserClient();
+        const normalizedEmail = email.trim().toLowerCase();
+        const redirectUrl = `${window.location.origin}/api/auth/callback?redirect=${encodeURIComponent(
+          redirectTarget,
+        )}`;
 
-        if (sessionResponse?.session) {
-          const { error } = await supabase.auth.setSession({
-            access_token: sessionResponse.session.access_token,
-            refresh_token: sessionResponse.session.refresh_token,
-          });
+        const { data, error } = await supabase.auth.signUp({
+          email: normalizedEmail,
+          password,
+          options: {
+            emailRedirectTo: redirectUrl,
+          },
+        });
 
-          if (error) {
-            throw error;
-          }
+        if (error) {
+          throw error;
         }
 
-        let authUserData:
-          | Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]
-          | null = null;
-
-        if (!requiresEmailConfirmation || sessionResponse?.session) {
-          const { data, error: authUserError } =
-            await supabase.auth.getUser();
-
-          if (authUserError) {
-            throw authUserError;
-          }
-
-          authUserData = data;
-        }
+        const requiresEmailConfirmation = !data.session;
 
         toast.success(
           requiresEmailConfirmation
@@ -157,17 +110,12 @@ export function RegisterSection() {
           { id: toastId },
         );
 
-        if (requiresEmailConfirmation) {
-          return { shouldRedirect: false };
-        }
-
-        if (authUserData?.user) {
-          window.location.replace(redirectTarget);
+        if (data.session) {
+          redirectViaAuthCallback(data.session, redirectTarget);
           return { shouldRedirect: true };
         }
 
-        window.location.replace(redirectTarget);
-        return { shouldRedirect: true };
+        return { shouldRedirect: false };
       } catch (error) {
         toast.error(
           error instanceof Error
@@ -215,6 +163,50 @@ export function RegisterSection() {
   });
 
   const { errors, touched, values } = formik;
+  const [oauthProviderLoading, setOauthProviderLoading] = useState<
+    "google" | "github" | null
+  >(null);
+
+  const handleOAuthSignIn = async (provider: "google" | "github") => {
+    const providerLabels: Record<typeof provider, string> = {
+      google: "Google",
+      github: "GitHub",
+    };
+
+    setOauthProviderLoading(provider);
+    const toastId = toast.loading(`Redirecting to ${providerLabels[provider]}`);
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const redirectUrl = new URL("/api/auth/callback", window.location.origin);
+      redirectUrl.searchParams.set("redirect", redirectTarget);
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectUrl.toString(),
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.dismiss(toastId);
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to continue with the selected provider. Please try again.",
+        { id: toastId },
+      );
+      setOauthProviderLoading(null);
+    }
+  };
 
   return (
     <main className="bg-background text-foreground grid min-h-svh md:grid-cols-2">
@@ -288,7 +280,12 @@ export function RegisterSection() {
               variant="secondary"
               type="button"
               className="w-full sm:flex-1"
-              disabled={mutation.isPending || formik.isSubmitting}
+              disabled={
+                mutation.isPending ||
+                formik.isSubmitting ||
+                oauthProviderLoading !== null
+              }
+              onClick={() => handleOAuthSignIn("google")}
             >
               <FcGoogle className="mr-2 size-4" />
               Continue with Google
@@ -297,7 +294,12 @@ export function RegisterSection() {
               variant="secondary"
               type="button"
               className="w-full sm:flex-1"
-              disabled={mutation.isPending || formik.isSubmitting}
+              disabled={
+                mutation.isPending ||
+                formik.isSubmitting ||
+                oauthProviderLoading !== null
+              }
+              onClick={() => handleOAuthSignIn("github")}
             >
               <FaGithub className="mr-2 size-4" />
               Continue with GitHub

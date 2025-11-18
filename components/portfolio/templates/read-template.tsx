@@ -13,7 +13,7 @@ import { formatYear } from "@/lib/date";
 import { selectAvatarSource } from "@/lib/utils";
 import { COUNTRIES } from "@/types/country";
 
-import type { PortfolioTemplateProps } from "./types";
+import type { PortfolioTemplateProps } from "../types";
 
 const TIMELINE_GRID_CLASSES = "grid gap-4 md:grid-cols-[124px_auto]";
 const TIMELINE_LABEL_CLASSES =
@@ -25,7 +25,7 @@ const formatRange = (range: { from: string; to?: string }) => {
     : `${formatYear(range.from)} - Present`;
 };
 
-export function ClassicPortfolioTemplate({
+export function ReadTemplate({
   portfolio,
   menuSessionState,
 }: PortfolioTemplateProps) {
@@ -60,8 +60,7 @@ export function ClassicPortfolioTemplate({
   const hasSpeaking =
     Array.isArray(portfolio.speaking) && portfolio.speaking.length > 0;
   const hasProjects =
-    Array.isArray(portfolio.sideProjects) &&
-    portfolio.sideProjects.length > 0;
+    Array.isArray(portfolio.sideProjects) && portfolio.sideProjects.length > 0;
   const hasEducation =
     Array.isArray(portfolio.education) && portfolio.education.length > 0;
   const hasContact =
@@ -174,27 +173,28 @@ export function ClassicPortfolioTemplate({
                             </p>
                           )}
                         </div>
-                        {Array.isArray(role.images) && role.images.length > 0 && (
-                          <div className="flex flex-wrap gap-4">
-                            {role.images.map((image, index) => (
-                              <div
-                                key={`${index}-${image.src}`}
-                                className="bg-muted relative aspect-video w-full max-w-48 overflow-hidden rounded"
-                              >
-                                <Image
-                                  src={image.src}
-                                  alt={
-                                    image.alt ||
-                                    `${role.company} ${index + 1}`
-                                  }
-                                  fill
-                                  sizes="192px"
-                                  className="object-cover"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        {Array.isArray(role.images) &&
+                          role.images.length > 0 && (
+                            <div className="flex flex-wrap gap-4">
+                              {role.images.map((image, index) => (
+                                <div
+                                  key={`${index}-${image.src}`}
+                                  className="bg-muted relative aspect-video w-full max-w-48 overflow-hidden rounded"
+                                >
+                                  <Image
+                                    src={image.src}
+                                    alt={
+                                      image.alt ||
+                                      `${role.company} ${index + 1}`
+                                    }
+                                    fill
+                                    sizes="192px"
+                                    className="object-cover"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
                       </div>
                     </article>
                   </li>

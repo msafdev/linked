@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { DashboardMobileNav } from "@/components/dashboard/mobile-nav";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 
 import { DASHBOARD_BASE_PATH, DASHBOARD_SECTIONS } from "@/lib/config";
@@ -23,7 +24,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         sections={DASHBOARD_SECTIONS}
         basePath={DASHBOARD_BASE_PATH}
       />
-      <div className="flex-1 overflow-y-auto">{children}</div>
+      <div className="relative flex-1 overflow-y-auto">
+        <DashboardMobileNav
+          sections={DASHBOARD_SECTIONS}
+          basePath={DASHBOARD_BASE_PATH}
+        />
+        {children}
+      </div>
     </div>
   );
 }

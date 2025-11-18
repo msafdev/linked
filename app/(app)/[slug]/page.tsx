@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import type { MenuSessionState } from "@/components/menu";
-import { resolvePortfolioTemplateComponent } from "@/components/portfolio/templates";
+import { resolvePortfolioTemplateComponent } from "@/components/portfolio";
 
 import { decodeJwtPayload, isTokenExpired } from "@/lib/auth/token";
 import { SITE_BASE_URL, SITE_NAME } from "@/lib/site";

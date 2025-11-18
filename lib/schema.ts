@@ -33,10 +33,19 @@ const avatarSchema = z.object({
 
 export const profileSchema = z
   .object({
-    name: z.string().min(1, "Name is required").max(32, "Name must be 32 characters or fewer"),
-    title: z.string().min(1, "Title is required").max(32, "Title must be 32 characters or fewer"),
+    name: z
+      .string()
+      .min(1, "Name is required")
+      .max(32, "Name must be 32 characters or fewer"),
+    title: z
+      .string()
+      .min(1, "Title is required")
+      .max(32, "Title must be 32 characters or fewer"),
     location: z.string().min(1, "Location is required"),
-    about: z.string().min(1, "About is required").max(500, "About must be 500 characters or fewer"),
+    about: z
+      .string()
+      .min(1, "About is required")
+      .max(500, "About must be 500 characters or fewer"),
     website: z.object({
       label: optionalStringSchema,
       url: optionalUrlSchema,
@@ -168,6 +177,7 @@ const settingsSchema = z.object({
   billingStatus: z.string().min(1),
   billingType: z.string().min(1),
   template: z.enum(PORTFOLIO_TEMPLATE_IDS),
+  isPublic: z.boolean(),
 });
 
 export type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -332,12 +342,32 @@ export function createContactInitialValues(data: ReadCV): ContactFormValues {
   };
 }
 
+const sanitizeDomainValue = (value?: string | null): string => {
+  if (!value) {
+    return "";
+  }
+
+  const sanitized = value
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "")
+    .slice(0, 32);
+  return sanitized;
+};
+
 export function createSettingsInitialValues(data: ReadCV): SettingsFormValues {
+  const existingDomain = sanitizeDomainValue(data.settings?.domain);
+  const derivedDomain =
+    existingDomain ||
+    sanitizeDomainValue(data.profile?.name) ||
+    sanitizeDomainValue(data.settings?.domain) ||
+    sanitizeDomainValue(data.id);
+
   return {
-    domain: (data.settings?.domain ?? data.id ?? "").toLowerCase(),
+    domain: derivedDomain,
     billingStatus: data.settings?.billingStatus ?? "trial",
     billingType: data.settings?.billingType ?? "free",
     template: data.settings?.template ?? DEFAULT_PORTFOLIO_TEMPLATE_ID,
+    isPublic: data.settings?.isPublic ?? true,
   };
 }
 
@@ -375,6 +405,7 @@ const EMPTY_READ_CV: ReadCV = {
     billingStatus: "trial",
     billingType: "free",
     template: DEFAULT_PORTFOLIO_TEMPLATE_ID,
+    isPublic: true,
   },
 };
 

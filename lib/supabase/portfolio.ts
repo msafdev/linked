@@ -78,19 +78,47 @@ const mapReadCv = (
 
   const avatarData = profileData.avatar as
     | ReadCV["profile"]["avatar"]
+    | { src?: string | null; alt?: string | null; storagePath?: string | null }
     | undefined;
+
+  const normalizeAvatarResource = (
+    value: unknown,
+  ): { src: string; alt: string; storagePath: string } | null => {
+    if (!value || typeof value !== "object") {
+      return null;
+    }
+    const candidate = value as {
+      src?: unknown;
+      alt?: unknown;
+      storagePath?: unknown;
+    };
+    const src =
+      typeof candidate.src === "string" && candidate.src.trim().length > 0
+        ? candidate.src
+        : "";
+    if (!src) {
+      return null;
+    }
+    const alt =
+      typeof candidate.alt === "string" && candidate.alt.trim().length > 0
+        ? candidate.alt
+        : "";
+    const storagePath =
+      typeof candidate.storagePath === "string" ? candidate.storagePath : "";
+    return { src, alt, storagePath };
+  };
+
   const normalizedAvatar = Array.isArray(avatarData)
     ? avatarData
-        .map((item) => ({
-          src: typeof item?.src === "string" ? item.src : "",
-          alt: typeof item?.alt === "string" ? item.alt : "",
-          storagePath:
-            typeof (item as { storagePath?: string })?.storagePath === "string"
-              ? ((item as { storagePath?: string }).storagePath ?? "")
-              : "",
-        }))
-        .filter((item) => item.src.length > 0)
-    : [];
+        .map((item) => normalizeAvatarResource(item))
+        .filter(
+          (item): item is { src: string; alt: string; storagePath: string } =>
+            Boolean(item),
+        )
+    : (() => {
+        const single = normalizeAvatarResource(avatarData);
+        return single ? [single] : [];
+      })();
 
   const rawDomain =
     (typeof setting?.domain === "string" && setting.domain) ||
@@ -108,6 +136,13 @@ const mapReadCv = (
     (typeof settingsData.billingType === "string" &&
       settingsData.billingType) ||
     "free";
+
+  const rawIsPublic =
+    typeof setting?.is_public === "boolean"
+      ? setting.is_public
+      : (settingsData as { isPublic?: unknown })?.isPublic;
+  const isPublic =
+    typeof rawIsPublic === "boolean" ? rawIsPublic : true;
 
   const preferences =
     setting?.preferences && typeof setting.preferences === "object"
@@ -163,6 +198,7 @@ const mapReadCv = (
       billingType:
         (rawBillingType as ReadCV["settings"]["billingType"]) ?? "free",
       template,
+      isPublic,
     },
   };
 };
@@ -222,9 +258,15 @@ const fetchSettingByAccountId = async (
   return data ?? null;
 };
 
+type FetchPortfolioOptions = {
+  requirePublic?: boolean;
+};
+
 export const fetchPortfolioByAccountId = async (
   accountId: string,
+  options?: FetchPortfolioOptions,
 ): Promise<ReadCV | null> => {
+  const requirePublic = options?.requirePublic ?? true;
   const supabase = createSupabaseServerClient();
 
   const [publicAccount, contentRows, setting] = await Promise.all([
@@ -233,7 +275,9 @@ export const fetchPortfolioByAccountId = async (
     fetchSettingByAccountId(supabase, accountId),
   ]);
 
-  if (!setting || !setting.is_public) return null;
+  if (requirePublic && (!setting || !setting.is_public)) {
+    return null;
+  }
 
   const sectionMap = createSectionMap(contentRows);
 
@@ -243,9 +287,8 @@ export const fetchPortfolioByAccountId = async (
     {
       id: accountId,
       full_name: publicAccount?.full_name ?? null,
-      email: null as any,
       avatar_url: publicAccount?.avatar_url ?? avatarSrcFromContent ?? null,
-    } as AccountRow,
+    },
     sectionMap,
     setting,
   );

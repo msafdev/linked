@@ -1,10 +1,12 @@
+import { BentoTemplate } from "@/components/portfolio/templates/bento-template";
+import { ReadTemplate } from "@/components/portfolio/templates/read-template";
+
 import {
   DEFAULT_PORTFOLIO_TEMPLATE_ID,
   PORTFOLIO_TEMPLATE_IDS,
   type PortfolioTemplateId,
 } from "@/types/portfolio-template";
 
-import { ClassicPortfolioTemplate } from "./classic-template";
 import type {
   PortfolioTemplateComponent,
   PortfolioTemplateProps,
@@ -14,7 +16,8 @@ const TEMPLATE_COMPONENTS: Record<
   PortfolioTemplateId,
   PortfolioTemplateComponent
 > = {
-  classic: ClassicPortfolioTemplate,
+  read: ReadTemplate,
+  bento: BentoTemplate,
 };
 
 const isTemplateId = (value: unknown): value is PortfolioTemplateId => {

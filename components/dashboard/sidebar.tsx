@@ -2,41 +2,15 @@
 
 import { motion } from "motion/react";
 
-import type { IconType } from "react-icons";
-import {
-  PiAddressBookTabsDuotone,
-  PiBriefcaseDuotone,
-  PiCirclesThreeDuotone,
-  PiGearSixDuotone,
-  PiGraduationCapDuotone,
-  PiGridFourDuotone,
-  PiLightbulbDuotone,
-  PiNotebookDuotone,
-  PiUserDuotone,
-} from "react-icons/pi";
-
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import type {
-  DashboardSection,
-  DashboardSectionIcon,
-  DashboardSegment,
-} from "@/lib/config";
+import type { DashboardSection, DashboardSegment } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
-const ICONS: Record<DashboardSectionIcon, IconType> = {
-  profile: PiUserDuotone,
-  work: PiBriefcaseDuotone,
-  writing: PiNotebookDuotone,
-  speaking: PiLightbulbDuotone,
-  projects: PiCirclesThreeDuotone,
-  education: PiGraduationCapDuotone,
-  contact: PiAddressBookTabsDuotone,
-  settings: PiGearSixDuotone,
-};
+import { buildDashboardNavItems } from "./nav-utils";
 
 const SEGMENT_LABELS: Record<DashboardSegment, string> = {
   cv: "CV",
@@ -57,10 +31,15 @@ export function DashboardSidebar({
   const pathname = usePathname();
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
+  const navItems = useMemo(
+    () => buildDashboardNavItems(sections, basePath),
+    [basePath, sections],
+  );
+
   const groupedSections = SEGMENT_ORDER.map((segment) => ({
     segment,
     label: SEGMENT_LABELS[segment],
-    items: sections.filter((section) => section.segment === segment),
+    items: navItems.filter((section) => section.segment === segment),
   })).filter((group) => group.items.length > 0);
 
   return (
@@ -72,14 +51,12 @@ export function DashboardSidebar({
               {label}
             </span>
             <ul className="mt-3">
-              {items.map(({ key, label: itemLabel, icon }) => {
-                const href = `${basePath}/${key}`;
+              {items.map(({ key, label: itemLabel, Icon, href }) => {
                 const isActive =
                   pathname === href || pathname?.startsWith(`${href}/`);
                 const shouldHighlight = hoveredKey
                   ? hoveredKey === key
                   : isActive;
-                const IconComponent = ICONS[icon] ?? PiGridFourDuotone;
 
                 return (
                   <li key={key}>
@@ -106,7 +83,7 @@ export function DashboardSidebar({
                         />
                       )}
                       <span className="relative z-10 flex items-center gap-2.5">
-                        <IconComponent className="size-3 shrink-0" />
+                        <Icon className="size-3 shrink-0" />
                         <span className="text-sm">{itemLabel}</span>
                       </span>
                     </Link>

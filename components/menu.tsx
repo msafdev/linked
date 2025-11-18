@@ -148,7 +148,7 @@ export function Menu({ className, sessionState }: MenuProps) {
     <div
       ref={containerRef}
       className={cn(
-        "fixed top-6 right-6 z-[1000] flex flex-col items-center gap-3",
+        "fixed top-5 right-5 z-[1000] flex flex-col items-center gap-3",
         className,
       )}
     >

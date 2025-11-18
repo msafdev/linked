@@ -198,6 +198,7 @@ const seed = async () => {
         domain: "salmoon",
         billingStatus: "trial",
         template: DEFAULT_PORTFOLIO_TEMPLATE_ID,
+        isPublic: true,
       },
     },
   ];
@@ -207,6 +208,7 @@ const seed = async () => {
     domain: "salmoon",
     billing_status: "trial",
     billing_type: "free",
+    is_public: true,
     preferences: {
       theme: "dark",
       template: DEFAULT_PORTFOLIO_TEMPLATE_ID,

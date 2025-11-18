@@ -10,10 +10,13 @@ export const PORTFOLIO_TEMPLATE_METADATA: Record<
   PortfolioTemplateId,
   Omit<PortfolioTemplateMetadata, "id">
 > = {
-  classic: {
-    label: "Classic",
-    description:
-      "Timeline layout with balanced typography for multi-section portfolios.",
+  read: {
+    label: "Read",
+    description: "Clean timeline layout for structured multi-section profiles.",
+  },
+  bento: {
+    label: "Bento",
+    description: "Card-driven grid layout with a strong visual hierarchy.",
   },
 };
 

@@ -82,7 +82,9 @@ export default async function Page({ params }: DashboardStatePageProps) {
 
   const accountId = payload.sub;
 
-  const userData = await fetchPortfolioByAccountId(accountId);
+  const userData = await fetchPortfolioByAccountId(accountId, {
+    requirePublic: false,
+  });
 
   if (!userData) {
     notFound();

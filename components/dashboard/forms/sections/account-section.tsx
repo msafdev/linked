@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 import { authApi } from "@/api";
 import type { SectionInitialValuesMap } from "@/lib/schema";
@@ -41,6 +42,7 @@ export function renderSettingsSection(formik: SettingsFormik): ReactNode {
   const billingType = formik.values.billingType ?? "";
   const templateValue =
     formik.values.template ?? DEFAULT_PORTFOLIO_TEMPLATE_ID;
+  const isPublic = Boolean(formik.values.isPublic);
   const selectedTemplate =
     PORTFOLIO_TEMPLATE_OPTIONS.find(
       (option) => option.id === templateValue,
@@ -59,6 +61,7 @@ export function renderSettingsSection(formik: SettingsFormik): ReactNode {
       logoutToastRef.current = null;
     }
   };
+
   const logoutMutation = useMutation({
     mutationFn: async () => {
       await authApi.logout();
@@ -87,6 +90,7 @@ export function renderSettingsSection(formik: SettingsFormik): ReactNode {
 
   const domainError = getIn(formik.errors, "domain");
   const domainTouched = getIn(formik.touched, "domain");
+  
   const showDomainError =
     typeof domainError === "string" &&
     (formik.submitCount > 0 || Boolean(domainTouched));
@@ -177,6 +181,35 @@ export function renderSettingsSection(formik: SettingsFormik): ReactNode {
                 )}
               />
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-6 w-full space-y-6">
+        <div className="header">
+          <h2>Visibility</h2>
+          <p className="text-muted-foreground mt-0.5 font-sans text-sm font-normal">
+            Control whether your portfolio is accessible to the public.
+          </p>
+        </div>
+        <div className="grid grid-cols-8 items-center gap-4">
+          <div className="col-span-full flex flex-col items-start justify-center md:col-span-4">
+            <Label htmlFor="settings-visibility" className="font-medium">
+              Public profile
+            </Label>
+            <p className="text-muted-foreground mt-2 text-xs">
+              Turn this off to hide your site from the public URL.
+            </p>
+          </div>
+          <div className="col-span-full flex items-center justify-end gap-3 md:col-span-4">
+            <Switch
+              id="settings-visibility"
+              checked={isPublic}
+              onCheckedChange={(checked) =>
+                formik.setFieldValue("isPublic", checked)
+              }
+              aria-label="Toggle public profile visibility"
+            />
           </div>
         </div>
       </section>
