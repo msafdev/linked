@@ -7,10 +7,11 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import type { DashboardSection, DashboardSegment } from "@/lib/config";
+import type { DashboardSegment } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
-import { buildDashboardNavItems } from "./nav-utils";
+import type { DashboardNavItem, DashboardNavItemWithIcon } from "./nav-utils";
+import { addIconsToNavItems } from "./nav-utils";
 
 const SEGMENT_LABELS: Record<DashboardSegment, string> = {
   cv: "CV",
@@ -20,34 +21,34 @@ const SEGMENT_LABELS: Record<DashboardSegment, string> = {
 const SEGMENT_ORDER: DashboardSegment[] = ["cv", "account"];
 
 type DashboardSidebarProps = {
-  sections: DashboardSection[];
-  basePath: string;
+  navItems: DashboardNavItem[];
 };
 
-export function DashboardSidebar({
-  sections,
-  basePath,
-}: DashboardSidebarProps) {
+export function DashboardSidebar({ navItems }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
-  const navItems = useMemo(
-    () => buildDashboardNavItems(sections, basePath),
-    [basePath, sections],
+  const itemsWithIcons: DashboardNavItemWithIcon[] = useMemo(
+    () => addIconsToNavItems(navItems),
+    [navItems],
   );
 
-  const groupedSections = SEGMENT_ORDER.map((segment) => ({
-    segment,
-    label: SEGMENT_LABELS[segment],
-    items: navItems.filter((section) => section.segment === segment),
-  })).filter((group) => group.items.length > 0);
+  const groupedSections = useMemo(
+    () =>
+      SEGMENT_ORDER.map((segment) => ({
+        segment,
+        label: SEGMENT_LABELS[segment],
+        items: itemsWithIcons.filter((section) => section.segment === segment),
+      })).filter((group) => group.items.length > 0),
+    [itemsWithIcons],
+  );
 
   return (
     <aside className="sticky top-0 hidden max-h-svh items-center md:flex">
       <nav className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-4">
         {groupedSections.map(({ segment, label, items }) => (
           <div key={segment}>
-            <span className="text-muted-foreground px-2 font-mono tracking-wide text-xs font-medium uppercase">
+            <span className="text-muted-foreground px-2 font-mono text-xs font-medium tracking-wide uppercase">
               {label}
             </span>
             <ul className="mt-3">

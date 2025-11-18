@@ -4,34 +4,24 @@ import { AnimatePresence, motion } from "motion/react";
 
 import { PiEqualsBold, PiXBold } from "react-icons/pi";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { usePathname, useRouter } from "next/navigation";
 
-import type { DashboardSection } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
-import { buildDashboardNavItems } from "./nav-utils";
+import type { DashboardNavItem } from "./nav-utils";
 
 type DashboardMobileNavProps = {
-  sections: DashboardSection[];
-  basePath: string;
+  items: DashboardNavItem[];
 };
 
-export function DashboardMobileNav({
-  sections,
-  basePath,
-}: DashboardMobileNavProps) {
+export function DashboardMobileNav({ items }: DashboardMobileNavProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-
-  const items = useMemo(
-    () => buildDashboardNavItems(sections, basePath),
-    [basePath, sections],
-  );
 
   useEffect(() => {
     if (!isOpen) return;
@@ -59,6 +49,19 @@ export function DashboardMobileNav({
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen]);
 
@@ -120,9 +123,12 @@ export function DashboardMobileNav({
                       <li key={key}>
                         <button
                           type="button"
-                          onClick={() => router.push(href)}
+                          onClick={() => {
+                            setIsOpen(false);
+                            router.push(href);
+                          }}
                           className={cn(
-                            "w-full font-heading text-base font-medium transition-colors",
+                            "font-heading w-full text-base font-medium transition-colors",
                             isActive
                               ? "text-foreground"
                               : "text-muted-foreground hover:text-foreground",
