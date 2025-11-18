@@ -12,11 +12,11 @@ import { cn } from "@/lib/utils";
 
 import type { DashboardNavItem } from "./nav-utils";
 
-type DashboardMobileNavProps = {
+type MenubarProps = {
   items: DashboardNavItem[];
 };
 
-export function DashboardMobileNav({ items }: DashboardMobileNavProps) {
+export function Menubar({ items }: MenubarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);

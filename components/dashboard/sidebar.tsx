@@ -20,11 +20,11 @@ const SEGMENT_LABELS: Record<DashboardSegment, string> = {
 
 const SEGMENT_ORDER: DashboardSegment[] = ["cv", "account"];
 
-type DashboardSidebarProps = {
+type SidebarProps = {
   navItems: DashboardNavItem[];
 };
 
-export function DashboardSidebar({ navItems }: DashboardSidebarProps) {
+export function Sidebar({ navItems }: SidebarProps) {
   const pathname = usePathname();
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 

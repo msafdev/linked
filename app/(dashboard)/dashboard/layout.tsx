@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 
 import type { Metadata } from "next";
 
-import { DashboardMobileNav } from "@/components/dashboard/mobile-nav";
+import { Menubar } from "@/components/dashboard/menubar";
 import { buildDashboardNavItems } from "@/components/dashboard/nav-utils";
-import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { Sidebar } from "@/components/dashboard/sidebar";
 
 import { DASHBOARD_BASE_PATH, DASHBOARD_SECTIONS } from "@/lib/config";
 import { SITE_NAME } from "@/lib/site";
@@ -27,9 +27,9 @@ export const metadata: Metadata = {
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div className="bg-background text-foreground flex min-h-svh">
-      <DashboardSidebar navItems={DASHBOARD_NAV_ITEMS} />
+      <Sidebar navItems={DASHBOARD_NAV_ITEMS} />
       <div className="relative flex-1 overflow-y-auto">
-        <DashboardMobileNav items={DASHBOARD_NAV_ITEMS} />
+        <Menubar items={DASHBOARD_NAV_ITEMS} />
         {children}
       </div>
     </div>
